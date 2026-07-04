@@ -13,9 +13,10 @@ DB_FILE = "vet_clinic.db"
 
 
 def init_db():
-    """Initialize database with all required tables"""
+    #Initialize database with all required tables
     if not os.path.exists(DB_FILE):
         conn = sqlite3.connect(DB_FILE)
+        conn.execute("PRAGMA foreign_keys = ON")
         cursor = conn.cursor()
         
         # Add Registrations table
@@ -30,11 +31,22 @@ def init_db():
             )
         ''')
         
+        # Add Appointments table
+        cursor.execute('''
+            CREATE TABLE appointments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                registration_id INTEGER NOT NULL,
+                owner_name TEXT NOT NULL,
+                pet_name TEXT NOT NULL,
+                pet_type TEXT NOT NULL,
+                appointment_date TEXT NOT NULL,
+                appointment_time TEXT NOT NULL,
+                veterinarian TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                FOREIGN KEY (registration_id) REFERENCES registrations(id) ON DELETE CASCADE
+            )
+        ''')
+        
         conn.commit()
         conn.close()
-        print("✓ Database initialized - Registrations table created")
-
-# Call at startup
-if __name__ == '__main__':
-    init_db()
-    app.run(debug=True)
+        print("✓ Database initialized - Appointments table created")
