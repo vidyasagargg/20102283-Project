@@ -80,3 +80,73 @@ def init_db():
                 FOREIGN KEY (registration_id) REFERENCES registrations(id) ON DELETE CASCADE
             )
         ''')
+
+
+        def get_db_connection():
+            #Create database connection with foreign keys enabled
+            conn = sqlite3.connect(DB_FILE)
+            conn.execute("PRAGMA foreign_keys = ON")
+            conn.row_factory = sqlite3.Row  # Return rows as dictionaries
+            return conn
+
+        def dict_from_row(row):
+            #Convert sqlite3.Row to dictionary
+            if row is None:
+                return None
+            return dict(row)
+
+        def error_response(message, status_code=400):
+            #Return standardized error response
+            return jsonify({"error": message}), status_code
+        
+        
+
+        @app.route('/api/registrations', methods=['POST'])
+        def create_registration():
+            """Create a new pet registration"""
+            try:
+                data = request.get_json()
+                
+                if not data:
+                    return error_response("Invalid JSON data", 400)
+                
+                # Validate required fields
+                if not data.get('owner_name') or data.get('owner_name').strip() == '':
+                    return error_response("owner_name is required and cannot be empty", 400)
+                if not data.get('owner_phone'):
+                    return error_response("owner_phone is required", 400)
+                if not data.get('pet_name'):
+                    return error_response("pet_name is required", 400)
+                if not data.get('pet_type'):
+                    return error_response("pet_type is required", 400)
+                if 'pet_age' not in data:
+                    return error_response("pet_age is required", 400)
+                
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT INTO registrations 
+                    (owner_name, owner_phone, pet_name, pet_type, pet_age)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (
+                    data['owner_name'],
+                    data['owner_phone'],
+                    data['pet_name'],
+                    data['pet_type'],
+                    data['pet_age']
+                ))
+                
+                conn.commit()
+                registration_id = cursor.lastrowid
+                conn.close()
+                
+                return jsonify({
+                    "id": registration_id,
+                    "owner_name": data['owner_name'],
+                    "pet_name": data['pet_name'],
+                    "message": "Registration created successfully"
+                }), 201
+            
+            except Exception as e:
+                return error_response(f"Database error: {str(e)}", 500)
