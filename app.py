@@ -150,3 +150,22 @@ def init_db():
             
             except Exception as e:
                 return error_response(f"Database error: {str(e)}", 500)
+            
+        #Read API Registrations
+            @app.route('/api/registrations', methods=['GET'])
+            def get_all_registrations():
+                """Retrieve all pet registrations"""
+                try:
+                    conn = get_db_connection()
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('SELECT * FROM registrations ORDER BY id')
+                    registrations = cursor.fetchall()
+                    conn.close()
+                    
+                    return jsonify([dict_from_row(row) for row in registrations]), 200
+                
+                except Exception as e:
+                    return error_response(f"Database error: {str(e)}", 500)
+                
+                
