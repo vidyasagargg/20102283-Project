@@ -169,6 +169,25 @@ def init_db():
                     return error_response(f"Database error: {str(e)}", 500)
                 
 
+                #Read single record operation for registrations
+                @app.route('/api/registrations/<int:id>', methods=['GET'])
+                def get_registration(id):
+                    """Retrieve a specific registration by ID"""
+                    try:
+                        conn = get_db_connection()
+                        cursor = conn.cursor()
+                        
+                        cursor.execute('SELECT * FROM registrations WHERE id = ?', (id,))
+                        registration = cursor.fetchone()
+                        conn.close()
+                        
+                        if not registration:
+                            return error_response(f"Registration with id {id} not found", 404)
+                        
+                        return jsonify(dict_from_row(registration)), 200
+                    
+                    except Exception as e:
+                        return error_response(f"Database error: {str(e)}", 500)
                 #Update operation API for registrations
                 @app.route('/api/registrations/<int:id>', methods=['PUT'])
                 def update_registration(id):
