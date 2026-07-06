@@ -154,7 +154,7 @@ def init_db():
         #Read API Registrations
             @app.route('/api/registrations', methods=['GET'])
             def get_all_registrations():
-                """Retrieve all pet registrations"""
+                #Retrieve all pet registrations
                 try:
                     conn = get_db_connection()
                     cursor = conn.cursor()
@@ -172,7 +172,7 @@ def init_db():
                 #Read single record operation for registrations
                 @app.route('/api/registrations/<int:id>', methods=['GET'])
                 def get_registration(id):
-                    """Retrieve a specific registration by ID"""
+                    #Retrieve a specific registration by ID
                     try:
                         conn = get_db_connection()
                         cursor = conn.cursor()
@@ -191,7 +191,7 @@ def init_db():
                 #Update operation API for registrations
                 @app.route('/api/registrations/<int:id>', methods=['PUT'])
                 def update_registration(id):
-                    """Update an existing registration"""
+                    #Update an existing registration
                     try:
                         data = request.get_json()
                         
@@ -241,3 +241,29 @@ def init_db():
                     
                     except Exception as e:
                         return error_response(f"Database error: {str(e)}", 500)
+                    
+
+                    #Delete record operation API for registrations
+                    @app.route('/api/registrations/<int:id>', methods=['DELETE'])
+                    def delete_registration(id):
+                        #Delete a registration and all associated records (cascade)
+                        try:
+                            conn = get_db_connection()
+                            cursor = conn.cursor()
+                            
+                            # Check if registration exists
+                            cursor.execute('SELECT * FROM registrations WHERE id = ?', (id,))
+                            if not cursor.fetchone():
+                                return error_response(f"Registration with id {id} not found", 404)
+                            
+                            # Delete registration (cascade delete handles related records)
+                            cursor.execute('DELETE FROM registrations WHERE id = ?', (id,))
+                            conn.commit()
+                            conn.close()
+                            
+                            return jsonify({"message": "Registration deleted successfully"}), 200
+                        
+                        except Exception as e:
+                            return error_response(f"Database error: {str(e)}", 500)
+                        
+
