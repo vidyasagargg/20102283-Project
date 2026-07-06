@@ -65,3 +65,18 @@ def init_db():
                 FOREIGN KEY (registration_id) REFERENCES registrations(id) ON DELETE CASCADE
             )
         ''')
+
+
+        # Add Vaccinations table to maintain Vaccine records
+        cursor.execute('''
+            CREATE TABLE vaccinations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                registration_id INTEGER NOT NULL,
+                owner_name TEXT NOT NULL,
+                pet_name TEXT NOT NULL,
+                veterinarian TEXT NOT NULL,
+                vaccination_details TEXT NOT NULL,
+                vaccination_date TEXT NOT NULL,
+                FOREIGN KEY (registration_id) REFERENCES registrations(id) ON DELETE CASCADE
+            )
+        ''')
