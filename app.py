@@ -50,3 +50,18 @@ def init_db():
         conn.commit()
         conn.close()
         print("✓ Database initialized - Appointments table created")
+
+        # Add Medication table
+        cursor.execute('''
+            CREATE TABLE medications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                registration_id INTEGER NOT NULL,
+                owner_name TEXT NOT NULL,
+                pet_name TEXT NOT NULL,
+                veterinarian TEXT NOT NULL,
+                medication_details TEXT NOT NULL,
+                frequency TEXT NOT NULL,
+                symptoms TEXT,
+                FOREIGN KEY (registration_id) REFERENCES registrations(id) ON DELETE CASCADE
+            )
+        ''')
