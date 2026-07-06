@@ -168,4 +168,57 @@ def init_db():
                 except Exception as e:
                     return error_response(f"Database error: {str(e)}", 500)
                 
-                
+
+                #Update operation API for registrations
+                @app.route('/api/registrations/<int:id>', methods=['PUT'])
+                def update_registration(id):
+                    """Update an existing registration"""
+                    try:
+                        data = request.get_json()
+                        
+                        if not data:
+                            return error_response("Invalid JSON data", 400)
+                        
+                        conn = get_db_connection()
+                        cursor = conn.cursor()
+                        
+                        # Check if registration exists
+                        cursor.execute('SELECT * FROM registrations WHERE id = ?', (id,))
+                        if not cursor.fetchone():
+                            return error_response(f"Registration with id {id} not found", 404)
+                        
+                        # Update fields (only if provided)
+                        updates = []
+                        values = []
+                        
+                        if 'owner_name' in data:
+                            if data['owner_name'].strip() == '':
+                                return error_response("owner_name cannot be empty", 400)
+                            updates.append('owner_name = ?')
+                            values.append(data['owner_name'])
+                        if 'owner_phone' in data:
+                            updates.append('owner_phone = ?')
+                            values.append(data['owner_phone'])
+                        if 'pet_name' in data:
+                            updates.append('pet_name = ?')
+                            values.append(data['pet_name'])
+                        if 'pet_type' in data:
+                            updates.append('pet_type = ?')
+                            values.append(data['pet_type'])
+                        if 'pet_age' in data:
+                            updates.append('pet_age = ?')
+                            values.append(data['pet_age'])
+                        
+                        if not updates:
+                            return error_response("No fields to update", 400)
+                        
+                        values.append(id)
+                        query = f"UPDATE registrations SET {', '.join(updates)} WHERE id = ?"
+                        cursor.execute(query, values)
+                        conn.commit()
+                        conn.close()
+                        
+                        return jsonify({"message": "Registration updated successfully", "id": id}), 200
+                    
+                    except Exception as e:
+                        return error_response(f"Database error: {str(e)}", 500)
