@@ -267,3 +267,59 @@ def init_db():
                             return error_response(f"Database error: {str(e)}", 500)
                         
 
+                        #API for create appointment
+                        @app.route('/api/appointments', methods=['POST'])
+                        def create_appointment():
+                            #Create a new appointment
+                            try:
+                                data = request.get_json()
+                                
+                                if not data:
+                                    return error_response("Invalid JSON data", 400)
+                                
+                                # Validate required fields
+                                required_fields = ['registration_id', 'owner_name', 'pet_name', 'pet_type',
+                                                'appointment_date', 'appointment_time', 'veterinarian', 'reason']
+                                for field in required_fields:
+                                    if not data.get(field):
+                                        return error_response(f"{field} is required", 400)
+                                
+                                conn = get_db_connection()
+                                cursor = conn.cursor()
+                                
+                                # Verify registration exists
+                                cursor.execute('SELECT * FROM registrations WHERE id = ?', (data['registration_id'],))
+                                if not cursor.fetchone():
+                                    return error_response(f"Registration with id {data['registration_id']} not found", 404)
+                                
+                                cursor.execute('''
+                                    INSERT INTO appointments 
+                                    (registration_id, owner_name, pet_name, pet_type, appointment_date, 
+                                    appointment_time, veterinarian, reason)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                ''', (
+                                    data['registration_id'],
+                                    data['owner_name'],
+                                    data['pet_name'],
+                                    data['pet_type'],
+                                    data['appointment_date'],
+                                    data['appointment_time'],
+                                    data['veterinarian'],
+                                    data['reason']
+                                ))
+                                
+                                conn.commit()
+                                appointment_id = cursor.lastrowid
+                                conn.close()
+                                
+                                return jsonify({
+                                    "id": appointment_id,
+                                    "registration_id": data['registration_id'],
+                                    "appointment_date": data['appointment_date'],
+                                    "message": "Appointment created successfully"
+                                }), 201
+                            
+                            except Exception as e:
+                                return error_response(f"Database error: {str(e)}", 500)
+                        
+
