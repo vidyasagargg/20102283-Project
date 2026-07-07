@@ -529,6 +529,73 @@ def init_db():
                                                 
                                                 except Exception as e:
                                                     return error_response(f"Database error: {str(e)}", 500)
+                                                
+                                                #Adding Update operation
+                                                @app.route('/api/medications/<int:id>', methods=['PUT'])
+                                                def update_medication(id):
+                                                    """Update a medication record"""
+                                                    try:
+                                                        data = request.get_json()
+                                                        
+                                                        if not data:
+                                                            return error_response("Invalid JSON data", 400)
+                                                        
+                                                        conn = get_db_connection()
+                                                        cursor = conn.cursor()
+                                                        
+                                                        cursor.execute('SELECT * FROM medications WHERE id = ?', (id,))
+                                                        if not cursor.fetchone():
+                                                            return error_response(f"Medication with id {id} not found", 404)
+                                                        
+                                                        updates = []
+                                                        values = []
+                                                        
+                                                        if 'medication_details' in data:
+                                                            if not data['medication_details'].strip():
+                                                                return error_response("medication_details cannot be empty", 400)
+                                                            updates.append('medication_details = ?')
+                                                            values.append(data['medication_details'])
+                                                        if 'frequency' in data:
+                                                            updates.append('frequency = ?')
+                                                            values.append(data['frequency'])
+                                                        if 'symptoms' in data:
+                                                            updates.append('symptoms = ?')
+                                                            values.append(data['symptoms'])
+                                                        
+                                                        if not updates:
+                                                            return error_response("No fields to update", 400)
+                                                        
+                                                        values.append(id)
+                                                        query = f"UPDATE medications SET {', '.join(updates)} WHERE id = ?"
+                                                        cursor.execute(query, values)
+                                                        conn.commit()
+                                                        conn.close()
+                                                        
+                                                        return jsonify({"message": "Medication updated successfully"}), 200
+                                                    
+                                                    except Exception as e:
+                                                        return error_response(f"Database error: {str(e)}", 500)
+
+                                                #Adding delete operation
+                                                @app.route('/api/medications/<int:id>', methods=['DELETE'])
+                                                def delete_medication(id):
+                                                    """Delete a medication record"""
+                                                    try:
+                                                        conn = get_db_connection()
+                                                        cursor = conn.cursor()
+                                                        
+                                                        cursor.execute('SELECT * FROM medications WHERE id = ?', (id,))
+                                                        if not cursor.fetchone():
+                                                            return error_response(f"Medication with id {id} not found", 404)
+                                                        
+                                                        cursor.execute('DELETE FROM medications WHERE id = ?', (id,))
+                                                        conn.commit()
+                                                        conn.close()
+                                                        
+                                                        return jsonify({"message": "Medication deleted successfully"}), 200
+                                                    
+                                                    except Exception as e:
+                                                        return error_response(f"Database error: {str(e)}", 500)
                                             
 
 
