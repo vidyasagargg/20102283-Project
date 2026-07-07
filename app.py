@@ -321,5 +321,29 @@ def init_db():
                             
                             except Exception as e:
                                 return error_response(f"Database error: {str(e)}", 500)
+                            
+                            #API for reading all the appointments at once
+                            @app.route('/api/appointments', methods=['GET'])
+                            def get_all_appointments():
+                                #Retrieve all appointments
+                                try:
+                                    conn = get_db_connection()
+                                    cursor = conn.cursor()
+                                    
+                                    cursor.execute('''
+                                        SELECT a.* FROM appointments a
+                                        ORDER BY a.appointment_date, a.appointment_time
+                                    ''')
+                                    appointments = cursor.fetchall()
+                                    conn.close()
+                                    
+                                    return jsonify([dict_from_row(row) for row in appointments]), 200
+                                
+                                except Exception as e:
+                                    return error_response(f"Database error: {str(e)}", 500)
+                                
+                                
                         
+
+
 
