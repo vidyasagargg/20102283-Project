@@ -363,6 +363,79 @@ def init_db():
                                     except Exception as e:
                                         return error_response(f"Database error: {str(e)}", 500)
                                     
+                                    
+                                    #Update operation API for appointments
+                                    @app.route('/api/appointments/<int:id>', methods=['PUT'])
+                                    def update_appointment(id):
+                                        #Update an existing appointment
+                                        try:
+                                            data = request.get_json()
+                                            
+                                            if not data:
+                                                return error_response("Invalid JSON data", 400)
+                                            
+                                            conn = get_db_connection()
+                                            cursor = conn.cursor()
+                                            
+                                            # Check if appointment exists
+                                            cursor.execute('SELECT * FROM appointments WHERE id = ?', (id,))
+                                            if not cursor.fetchone():
+                                                return error_response(f"Appointment with id {id} not found", 404)
+                                            
+                                            # Update fields
+                                            updates = []
+                                            values = []
+                                            
+                                            if 'appointment_date' in data:
+                                                updates.append('appointment_date = ?')
+                                                values.append(data['appointment_date'])
+                                            if 'appointment_time' in data:
+                                                updates.append('appointment_time = ?')
+                                                values.append(data['appointment_time'])
+                                            if 'reason' in data:
+                                                updates.append('reason = ?')
+                                                values.append(data['reason'])
+                                            
+                                            if not updates:
+                                                return error_response("No fields to update", 400)
+                                            
+                                            values.append(id)
+                                            query = f"UPDATE appointments SET {', '.join(updates)} WHERE id = ?"
+                                            cursor.execute(query, values)
+                                            conn.commit()
+                                            conn.close()
+                                            
+                                            return jsonify({"message": "Appointment updated successfully"}), 200
+                                        
+                                        except Exception as e:
+                                            return error_response(f"Database error: {str(e)}", 500)
+
+
+                                    #Delate operation API for appointments
+                                    @app.route('/api/appointments/<int:id>', methods=['DELETE'])
+                                    def delete_appointment(id):
+                                        #Delete an appointment
+                                        try:
+                                            conn = get_db_connection()
+                                            cursor = conn.cursor()
+                                            
+                                            # Check if appointment exists
+                                            cursor.execute('SELECT * FROM appointments WHERE id = ?', (id,))
+                                            if not cursor.fetchone():
+                                                return error_response(f"Appointment with id {id} not found", 404)
+                                            
+                                            cursor.execute('DELETE FROM appointments WHERE id = ?', (id,))
+                                            conn.commit()
+                                            conn.close()
+                                            
+                                            return jsonify({"message": "Appointment deleted successfully"}), 200
+                                        
+                                        except Exception as e:
+                                            return error_response(f"Database error: {str(e)}", 500)
+    
+
+
+                                    
 
                         
 
