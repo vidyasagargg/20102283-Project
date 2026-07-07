@@ -342,7 +342,28 @@ def init_db():
                                 except Exception as e:
                                     return error_response(f"Database error: {str(e)}", 500)
                                 
-                                
+
+                                #Read API for single record
+                                @app.route('/api/appointments/<int:id>', methods=['GET'])
+                                def get_appointment(id):
+                                    #Retrieve a specific appointment by ID
+                                    try:
+                                        conn = get_db_connection()
+                                        cursor = conn.cursor()
+                                        
+                                        cursor.execute('SELECT * FROM appointments WHERE id = ?', (id,))
+                                        appointment = cursor.fetchone()
+                                        conn.close()
+                                        
+                                        if not appointment:
+                                            return error_response(f"Appointment with id {id} not found", 404)
+                                        
+                                        return jsonify(dict_from_row(appointment)), 200
+                                    
+                                    except Exception as e:
+                                        return error_response(f"Database error: {str(e)}", 500)
+                                    
+
                         
 
 
