@@ -432,7 +432,64 @@ def init_db():
                                         
                                         except Exception as e:
                                             return error_response(f"Database error: {str(e)}", 500)
+                                        
+
+
+                                        #Create medication records
+                                        @app.route('/api/medications', methods=['POST'])
+                                        def create_medication():
+                                            #Create a new medication record
+                                            try:
+                                                data = request.get_json()
+                                                
+                                                if not data:
+                                                    return error_response("Invalid JSON data", 400)
+                                                
+                                                required_fields = ['registration_id', 'owner_name', 'pet_name', 'veterinarian',
+                                                                'medication_details', 'frequency']
+                                                for field in required_fields:
+                                                    if not data.get(field):
+                                                        return error_response(f"{field} is required", 400)
+                                                
+                                                conn = get_db_connection()
+                                                cursor = conn.cursor()
+                                                
+                                                # Verify registration exists
+                                                cursor.execute('SELECT * FROM registrations WHERE id = ?', (data['registration_id'],))
+                                                if not cursor.fetchone():
+                                                    return error_response(f"Registration with id {data['registration_id']} not found", 404)
+                                                
+                                                cursor.execute('''
+                                                    INSERT INTO medications 
+                                                    (registration_id, owner_name, pet_name, veterinarian, medication_details, frequency, symptoms)
+                                                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                                                ''', (
+                                                    data['registration_id'],
+                                                    data['owner_name'],
+                                                    data['pet_name'],
+                                                    data['veterinarian'],
+                                                    data['medication_details'],
+                                                    data['frequency'],
+                                                    data.get('symptoms', '')
+                                                ))
+                                                
+                                                conn.commit()
+                                                medication_id = cursor.lastrowid
+                                                conn.close()
+                                                
+                                                return jsonify({
+                                                    "id": medication_id,
+                                                    "message": "Medication recorded successfully"
+                                                }), 201
+                                            
+                                            except Exception as e:
+                                                return error_response(f"Database error: {str(e)}", 500)
+                                            
+
+
+
     
+
 
 
                                     
