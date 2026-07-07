@@ -486,6 +486,51 @@ def init_db():
                                                 return error_response(f"Database error: {str(e)}", 500)
                                             
 
+                                            #Read operation for medication
+                                            @app.route('/api/medications', methods=['GET'])
+                                            def get_all_medications():
+                                                #Retrieve all medications
+                                                try:
+                                                    conn = get_db_connection()
+                                                    cursor = conn.cursor()
+                                                    
+                                                    # Check for registration_id query parameter
+                                                    registration_id = request.args.get('registration_id')
+                                                    
+                                                    if registration_id:
+                                                        cursor.execute('SELECT * FROM medications WHERE registration_id = ?', (registration_id,))
+                                                    else:
+                                                        cursor.execute('SELECT * FROM medications ORDER BY id')
+                                                    
+                                                    medications = cursor.fetchall()
+                                                    conn.close()
+                                                    
+                                                    return jsonify([dict_from_row(row) for row in medications]), 200
+                                                
+                                                except Exception as e:
+                                                    return error_response(f"Database error: {str(e)}", 500)
+
+
+                                            @app.route('/api/medications/<int:id>', methods=['GET'])
+                                            def get_medication(id):
+                                                #Retrieve a specific medication by ID"""
+                                                try:
+                                                    conn = get_db_connection()
+                                                    cursor = conn.cursor()
+                                                    
+                                                    cursor.execute('SELECT * FROM medications WHERE id = ?', (id,))
+                                                    medication = cursor.fetchone()
+                                                    conn.close()
+                                                    
+                                                    if not medication:
+                                                        return error_response(f"Medication with id {id} not found", 404)
+                                                    
+                                                    return jsonify(dict_from_row(medication)), 200
+                                                
+                                                except Exception as e:
+                                                    return error_response(f"Database error: {str(e)}", 500)
+                                            
+
 
 
     
