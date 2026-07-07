@@ -533,7 +533,7 @@ def init_db():
                                                 #Adding Update operation
                                                 @app.route('/api/medications/<int:id>', methods=['PUT'])
                                                 def update_medication(id):
-                                                    """Update a medication record"""
+                                                    #Update a medication record
                                                     try:
                                                         data = request.get_json()
                                                         
@@ -579,7 +579,7 @@ def init_db():
                                                 #Adding delete operation
                                                 @app.route('/api/medications/<int:id>', methods=['DELETE'])
                                                 def delete_medication(id):
-                                                    """Delete a medication record"""
+                                                    #Delete a medication recorD
                                                     try:
                                                         conn = get_db_connection()
                                                         cursor = conn.cursor()
@@ -596,6 +596,11 @@ def init_db():
                                                     
                                                     except Exception as e:
                                                         return error_response(f"Database error: {str(e)}", 500)
+                                                    
+
+
+                                                    
+
                                             
 
 
