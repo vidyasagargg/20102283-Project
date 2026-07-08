@@ -691,7 +691,82 @@ def init_db():
                                                                 return error_response(f"Database error: {str(e)}", 500)
                                                             
 
-                                                            
+                                                            #Read and Evalute medical records
+                                                            def evaluate_health_status(medications, vaccinations):
+                                                                #Evaluating pet health status based on medical records
+                                                                if not medications and not vaccinations:
+                                                                    return "🟢 Healthy", "Routine check-up recommended"
+                                                                
+                                                                # Check for urgent symptoms
+                                                                urgent_symptoms = ['fever', 'poisoning', 'severe', 'emergency', 'urgent', 'critical']
+                                                                
+                                                                for med in medications:
+                                                                    if med.get('symptoms'):
+                                                                        symptoms_lower = med['symptoms'].lower()
+                                                                        if any(keyword in symptoms_lower for keyword in urgent_symptoms):
+                                                                            return "🔴 Needs Attention", "Immediate veterinary consultation recommended"
+                                                                
+                                                                # Check vaccination status (simple check)
+                                                                if vaccinations:
+                                                                    return "🟢 Healthy", "Vaccinations up to date"
+                                                                
+                                                                return "🟡 Vaccination Overdue", "Schedule vaccination appointment"
+
+                                                            @app.route('/api/treatments/history', methods=['GET'])
+                                                            def get_treatment_history():
+                                                                """Get consolidated clinical report for a pet"""
+                                                                try:
+                                                                    registration_id = request.args.get('registration_id')
+                                                                    
+                                                                    if not registration_id:
+                                                                        return error_response("registration_id query parameter is required", 400)
+                                                                    
+                                                                    conn = get_db_connection()
+                                                                    cursor = conn.cursor()
+                                                                    
+                                                                    # Get registration
+                                                                    cursor.execute('SELECT * FROM registrations WHERE id = ?', (registration_id,))
+                                                                    registration = cursor.fetchone()
+                                                                    
+                                                                    if not registration:
+                                                                        return error_response(f"Registration with id {registration_id} not found", 404)
+                                                                    
+                                                                    reg = dict_from_row(registration)
+                                                                    
+                                                                    # Get appointments
+                                                                    cursor.execute('SELECT * FROM appointments WHERE registration_id = ?', (registration_id,))
+                                                                    appointments = [dict_from_row(row) for row in cursor.fetchall()]
+                                                                    
+                                                                    # Get medications
+                                                                    cursor.execute('SELECT * FROM medications WHERE registration_id = ?', (registration_id,))
+                                                                    medications = [dict_from_row(row) for row in cursor.fetchall()]
+                                                                    
+                                                                    # Get vaccinations
+                                                                    cursor.execute('SELECT * FROM vaccinations WHERE registration_id = ?', (registration_id,))
+                                                                    vaccinations = [dict_from_row(row) for row in cursor.fetchall()]
+                                                                    
+                                                                    conn.close()
+                                                                    
+                                                                    # Evaluate health status
+                                                                    status, recommendation = evaluate_health_status(medications, vaccinations)
+                                                                    
+                                                                    # Get latest veterinarian if available
+                                                                    latest_vet = "Not assigned"
+                                                                    if appointments:
+                                                                        latest_vet = appointments[-1].get('veterinarian', 'Not assigned')
+                                                                    
+                                                                    return jsonify({
+                                                                        "status": status,
+                                                                        "recommendation": recommendation,
+                                                                        "registration": reg,
+                                                                        "appointments": appointments,
+                                                                        "medications": medications,
+                                                                        "vaccinations": vaccinations,
+                                                                        "latest_veterinarian": latest_vet
+                                                                    }), 200
+                                                                
+                                                                except Exception as e:
+                                                                    return error_response(f"Database error: {str(e)}", 500)
                                                             
 
                                                             
