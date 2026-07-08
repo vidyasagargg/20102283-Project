@@ -648,7 +648,50 @@ def init_db():
                                                             return error_response(f"Database error: {str(e)}", 500)
                                                         
 
-                                                        
+                                                        #Read records operation
+                                                        @app.route('/api/vaccinations', methods=['GET'])
+                                                        def get_all_vaccinations():
+                                                            #Retrieve all vaccinations
+                                                            try:
+                                                                conn = get_db_connection()
+                                                                cursor = conn.cursor()
+                                                                
+                                                                registration_id = request.args.get('registration_id')
+                                                                
+                                                                if registration_id:
+                                                                    cursor.execute('SELECT * FROM vaccinations WHERE registration_id = ? ORDER BY vaccination_date DESC', (registration_id,))
+                                                                else:
+                                                                    cursor.execute('SELECT * FROM vaccinations ORDER BY vaccination_date DESC')
+                                                                
+                                                                vaccinations = cursor.fetchall()
+                                                                conn.close()
+                                                                
+                                                                return jsonify([dict_from_row(row) for row in vaccinations]), 200
+                                                            
+                                                            except Exception as e:
+                                                                return error_response(f"Database error: {str(e)}", 500)
+
+                                                        @app.route('/api/vaccinations/<int:id>', methods=['GET'])
+                                                        def get_vaccination(id):
+                                                            #Retrieve a specific vaccination by ID
+                                                            try:
+                                                                conn = get_db_connection()
+                                                                cursor = conn.cursor()
+                                                                
+                                                                cursor.execute('SELECT * FROM vaccinations WHERE id = ?', (id,))
+                                                                vaccination = cursor.fetchone()
+                                                                conn.close()
+                                                                
+                                                                if not vaccination:
+                                                                    return error_response(f"Vaccination with id {id} not found", 404)
+                                                                
+                                                                return jsonify(dict_from_row(vaccination)), 200
+                                                            
+                                                            except Exception as e:
+                                                                return error_response(f"Database error: {str(e)}", 500)
+                                                            
+
+                                                            
                                                             
 
                                                             
