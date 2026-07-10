@@ -214,3 +214,31 @@ async function fetchRegistrations() {
         showError(`Failed to load registrations: ${error.message}`);
     }
 }
+
+/**
+ * Load registration for editing
+ * @param {number} id - Registration ID
+ */
+async function editRegistration(id) {
+    try {
+        const registration = await createApiCall('GET', `/registrations/${id}`);
+        
+        document.getElementById('regId').value = registration.id;
+        document.getElementById('regOwnerName').value = registration.owner_name;
+        document.getElementById('regOwnerPhone').value = registration.owner_phone;
+        document.getElementById('regPetName').value = registration.pet_name;
+        document.getElementById('regPetType').value = registration.pet_type;
+        document.getElementById('regPetAge').value = registration.pet_age;
+        
+        // Show cancel button, change submit text
+        document.getElementById('regCancelBtn').style.display = 'inline-block';
+        document.getElementById('regSubmitBtn').textContent = 'Update Registration';
+        
+        editingRegistrationId = id;
+        
+        // Scroll to form
+        document.getElementById('registrationForm').scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        showError(`Failed to load registration: ${error.message}`);
+    }
+}
