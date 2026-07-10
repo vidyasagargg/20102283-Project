@@ -26,7 +26,7 @@
 
 
 #Adding logic to get all the registration info
-<!-- TAB 1: OWNER & PET REGISTRATION -->
+<!--First Tab: OWNER & PET REGISTRATION -->
     <div id="sectionRegistrations">
         <h2>Register / Edit Owner & Pet Profile</h2>
         <form id="registrationForm">
@@ -49,5 +49,45 @@
             </thead>
             <tbody id="registrationsBody"></tbody>
         </table>
+    </div>
+
+
+    #Adding
+    <!--Second Tab: APPOINTMENTS Booking -->
+    <div id="sectionAppointments" style="display:none;">
+        <h2>Book / Edit Appointment</h2>
+        <form id="appointmentForm">
+            <input type="hidden" id="appId">
+            <label for="appRegId"><b>Enter Registration ID:</b></label>
+            <input type="number" id="appRegId" oninput="verifyAndPopulateRegistration()" placeholder="e.g. 1" required>
+            <span id="validationFeedback" style="font-weight: bold; margin-left:10px;"></span>
+            <br><br>
+            <label for="appOwnerName">Owner Name:</label> <input type="text" id="appOwnerName" readonly required><br><br>
+            <label for="appPetName">Pet Name:</label> <input type="text" id="appPetName" readonly required><br><br>
+            <label for="appPetType">Pet Type:</label> <input type="text" id="appPetType" readonly required><br><br>
+            <label for="appDate">Date:</label> <input type="date" id="appDate" required><br><br>
+            <label for="appTime">Time:</label> <input type="time" id="appTime" required><br><br>
+            <label for="appVet">Assigned Veterinarian:</label> <select id="appVet" required></select><br><br>
+            <label for="appReason">Reason for Visit:</label><br>
+            <textarea id="appReason" rows="2" required></textarea><br><br>
+            
+            <button type="submit" id="appSubmitBtn">Save Appointment</button>
+            <button type="button" id="appCancelBtn" style="display:none;" onclick="clearAppointmentForm()">Cancel Edit</button>
+            <span id="appointmentSuccessMessage" style="color: green; font-weight: bold; margin-left: 15px;"></span>
+        </form>
+        <hr>
+        
+        <button type="button" id="viewAllAppsBtn" onclick="toggleAppointmentsLog()">View all appointments</button>
+        <br><br>
+        
+        <div id="appointmentsLogContainer" style="display:none;">
+            <h2>Scheduled Appointments Logs</h2>
+            <table border="1">
+                <thead>
+                    <tr><th>ID</th><th>Reg ID</th><th>Owner</th><th>Pet Name</th><th>Type</th><th>Date</th><th>Time</th><th>Veterinarian</th><th>Reason</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="appointmentsBody"></tbody>
+            </table>
+        </div>
     </div>
 
