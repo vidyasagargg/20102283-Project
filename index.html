@@ -1,4 +1,4 @@
-#Need to update code logic for front end here
+<!--Need to update code logic for front end here -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,8 +8,6 @@
 </head>
 <body>
     <h1>Paws & Claws Vet Clinic Management System</h1>
-    
-    <!-- Navigation will be added next -->
     
     <script src="app.js"></script>
 </body>
@@ -25,7 +23,7 @@
     <hr>
 
 
-#Adding logic to get all the registration info
+<!--Adding logic to get all the registration info -->
 <!--First Tab: OWNER & PET REGISTRATION -->
     <div id="sectionRegistrations">
         <h2>Register / Edit Owner & Pet Profile</h2>
@@ -52,7 +50,7 @@
     </div>
 
 
-    #Adding
+    <!--Adding logic to book appointments   -->
     <!--Second Tab: APPOINTMENTS Booking -->
     <div id="sectionAppointments" style="display:none;">
         <h2>Book / Edit Appointment</h2>
@@ -91,3 +89,77 @@
         </div>
     </div>
 
+
+    <!--Adding logic to add Medicines and Vaccination for treatment -->
+    <!-- Third Tab: TREATMENTS -Medicines & Vaccines -->
+    <div id="sectionTreatments" style="display:none;">
+        <div style="background-color: #f0f4f8; padding:15px; border:1px solid #ccc; margin-bottom:20px;">
+            <h3>Active Patient Profile Lookup Context</h3>
+            <label for="treatRegId"><b>Enter Patient Registration ID:</b></label>
+            <input type="number" id="treatRegId" oninput="verifyAndPopulateConsultation()" placeholder="e.g. 1" required>
+            <button type="button" onclick="resetPatientContext()" style="margin-left: 10px;">Clear Patient Context (New Patient)</button>
+            <br><br>
+            <span id="treatmentFeedback" style="font-weight: bold; display:block; margin-bottom:10px;"></span>
+            Owner Full Name: <input type="text" id="treatOwnerName" readonly> | 
+            Pet Target Name: <input type="text" id="treatPetName" readonly> | 
+            Attending Clinician: <input type="text" id="treatVet" readonly style="width:250px; font-weight:bold;">
+        </div>
+
+        <table style="width:100%;" border="0">
+            <tr>
+                <td style="width:50%; vertical-align:top; padding-right:10px;">
+                    <div style="border: 1px solid blue; padding:15px; background:#fff;">
+                        <h3>💊 Log Medication Prescription</h3>
+                        <form id="medicationForm">
+                            <input type="hidden" id="medId">
+                            <label for="treatMeds">Prescribed Medicine Details:</label><br>
+                            <input type="text" id="treatMeds" oninput="checkClinicalSafetyRules()" placeholder="e.g., Amoxicillin 50mg" style="width:90%;" required><br><br>
+
+                            <label for="treatFreq">Consumption Frequency Dropdown:</label><br>
+                            <select id="treatFreq" required style="width:94%; padding: 4px;">
+                                <option value="">-- Select Intake Frequency --</option>
+                                <option value="once a day">Once a day</option>
+                                <option value="twice a day">Twice a day</option>
+                                <option value="thrice a day">Thrice a day</option>
+                                <option value="weekly once">Weekly once</option>
+                            </select><br><br>
+
+                            <label for="treatSymptoms">Observed Clinical Symptoms:</label><br>
+                            <input type="text" id="treatSymptoms" placeholder="e.g., Fever, cough, lethargy" style="width:90%;"><br>
+                            
+                            <div id="safetyWarningMessage" style="color: red; font-weight: bold; margin-top: 5px;"></div><br>
+                            <button type="submit" id="medSubmitBtn" disabled>Append Medicine Entry</button>
+                            <button type="button" id="medCancelBtn" style="display:none;" onclick="clearMedicationFormOnly()">Cancel Edit</button>
+                        </form>
+                        <h4>Context Scoped Prescription Logs</h4>
+                        <table border="1" style="width:100%;">
+                            <thead><tr><th>ID</th><th>Pet Name</th><th>Prescription Details</th><th>Frequency</th><th>Actions</th></tr></thead>
+                            <tbody id="medicationsBody"></tbody>
+                        </table>
+                    </div>
+                </td>
+                
+                <td style="width:50%; vertical-align:top; padding-left:10px;">
+                    <div style="border: 1px solid purple; padding:15px; background:#fff;">
+                        <h3>💉 Log Administered Vaccination</h3>
+                        <form id="vaccinationForm">
+                            <input type="hidden" id="vacId">
+                            <label for="treatVacs">Vaccine Injection Details:</label><br>
+                            <input type="text" id="treatVacs" placeholder="e.g., Rabies Booster Batch #A4" style="width:90%;" required><br><br>
+
+                            <label for="treatVacDate">Booster Administration Date:</label><br>
+                            <input type="date" id="treatVacDate" required><br><br>
+
+                            <button type="submit" id="vacSubmitBtn" disabled>Append Vaccination Entry</button>
+                            <button type="button" id="vacCancelBtn" style="display:none;" onclick="clearVaccinationFormOnly()">Cancel Edit</button>
+                        </form>
+                        <h4>Context Scoped Vaccination Logs</h4>
+                        <table border="1" style="width:100%;">
+                            <thead><tr><th>ID</th><th>Pet Name</th><th>Vaccine Entry Details</th><th>Actions</th></tr></thead>
+                            <tbody id="vaccinationsBody"></tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
