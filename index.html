@@ -39,6 +39,26 @@
             <button type="button" id="regCancelBtn" style="display:none;" onclick="clearRegistrationForm()">Cancel Edit</button>
         </form>
         <hr>
+
+        <!-- DYNAMIC REPORT SUMMARY VIEW usimg History Button-->
+        <div id="petHistorySection" style="display:none; background-color: #f0f4f8; padding: 20px; border: 2px solid #333; margin-bottom: 20px;">
+            <h3 id="historyTitle" style="margin-top: 0; color: #1a2a3a;">Clinical Medical Card Report</h3>
+            
+            <div style="background: white; border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+                <h4>🛡️ Automated Real-Time Health Status Summary</h4>
+                <p><b>Pet Demographic Context:</b> <span id="reportMetaText"></span></p>
+                <p><b>Determined Health Status:</b> <span id="reportStatusBadge" style="font-size: 1.1em; font-weight: bold;"></span></p>
+                <p><b>Recommended Action Plan:</b> <span id="reportRecommendationText" style="font-style: italic; color: #444;"></span></p>
+            </div>
+
+            <table border="1" style="width: 100%; background: white;">
+                <thead>
+                    <tr><th>Entry ID</th><th>Type Class</th><th>Attending Veterinarian</th><th>Details Record Logged</th><th>Observed Symptoms Context</th></tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table><br>
+            <button type="button" onclick="document.getElementById('petHistorySection').style.display='none'">Close Medical Card</button>
+        </div>
         
         <h2>Registered Client Directory</h2>
         <table border="1">
