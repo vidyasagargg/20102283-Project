@@ -86,3 +86,47 @@ function showSuccess(message, elementId = null) {
         }
     }
 }
+
+
+// ============================================================================
+// TAB SWITCHING
+// ============================================================================
+
+/**
+ * Switch between tabs
+ * @param {string} tabName - Tab identifier: 'registrations', 'appointments', 'treatments'
+ */
+function switchTab(tabName) {
+    // Hide all tabs
+    document.getElementById('sectionRegistrations').style.display = 'none';
+    document.getElementById('sectionAppointments').style.display = 'none';
+    document.getElementById('sectionTreatments').style.display = 'none';
+    
+    // Show selected tab
+    switch(tabName) {
+        case 'registrations':
+            document.getElementById('sectionRegistrations').style.display = 'block';
+            currentTab = 'registrations';
+            fetchRegistrations();
+            break;
+        case 'appointments':
+            document.getElementById('sectionAppointments').style.display = 'block';
+            currentTab = 'appointments';
+            break;
+        case 'treatments':
+            document.getElementById('sectionTreatments').style.display = 'block';
+            currentTab = 'treatments';
+            break;
+    }
+    
+    // Update button styles
+    document.getElementById('tabBtnRegistrations').style.fontWeight = tabName === 'registrations' ? 'bold' : 'normal';
+    document.getElementById('tabBtnAppointments').style.fontWeight = tabName === 'appointments' ? 'bold' : 'normal';
+    document.getElementById('tabBtnTreatments').style.fontWeight = tabName === 'treatments' ? 'bold' : 'normal';
+}
+
+// Initialize on page load
+window.addEventListener('load', function() {
+    switchTab('registrations');
+    populateVeterinarianDropdown();
+});
