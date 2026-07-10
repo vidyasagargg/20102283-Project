@@ -25,5 +25,29 @@
     <hr>
 
 
-
+#Adding logic to get all the registration info
+<!-- TAB 1: OWNER & PET REGISTRATION -->
+    <div id="sectionRegistrations">
+        <h2>Register / Edit Owner & Pet Profile</h2>
+        <form id="registrationForm">
+            <input type="hidden" id="regId">
+            <label for="regOwnerName">Owner Full Name:</label> <input type="text" id="regOwnerName" required><br><br>
+            <label for="regOwnerPhone">Owner Phone:</label> <input type="text" id="regOwnerPhone" required><br><br>
+            <label for="regPetName">Pet Name:</label> <input type="text" id="regPetName" required><br><br>
+            <label for="regPetType">Pet Species Type:</label> <input type="text" id="regPetType" placeholder="e.g. Dog" required><br><br>
+            <label for="regPetAge">Pet Age (Years):</label> <input type="number" id="regPetAge" min="0" placeholder="e.g. 3" required><br><br>
+            
+            <button type="submit" id="regSubmitBtn">Register Client</button>
+            <button type="button" id="regCancelBtn" style="display:none;" onclick="clearRegistrationForm()">Cancel Edit</button>
+        </form>
+        <hr>
+        
+        <h2>Registered Client Directory</h2>
+        <table border="1">
+            <thead>
+                <tr><th>ID (Registration ID)</th><th>Owner Name</th><th>Phone Contact</th><th>Pet Name</th><th>Pet Species</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="registrationsBody"></tbody>
+        </table>
+    </div>
 
