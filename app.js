@@ -130,3 +130,57 @@ window.addEventListener('load', function() {
     switchTab('registrations');
     populateVeterinarianDropdown();
 });
+
+// ============================================================================
+// REGISTRATION FORM HANDLING
+// ============================================================================
+
+document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const regId = document.getElementById('regId').value;
+    const ownerName = document.getElementById('regOwnerName').value;
+    const ownerPhone = document.getElementById('regOwnerPhone').value;
+    const petName = document.getElementById('regPetName').value;
+    const petType = document.getElementById('regPetType').value;
+    const petAge = parseInt(document.getElementById('regPetAge').value);
+    
+    // Validation
+    if (!ownerName.trim()) {
+        showError('Owner name is required');
+        return;
+    }
+    if (!petAge || petAge < 0) {
+        showError('Valid pet age is required');
+        return;
+    }
+    
+    try {
+        const data = {
+            owner_name: ownerName,
+            owner_phone: ownerPhone,
+            pet_name: petName,
+            pet_type: petType,
+            pet_age: petAge
+        };
+        
+        let response;
+        if (regId) {
+            // Update existing
+            response = await createApiCall('PUT', `/registrations/${regId}`, data);
+            showSuccess('Registration updated successfully!');
+            editingRegistrationId = null;
+            document.getElementById('regCancelBtn').style.display = 'none';
+            document.getElementById('regSubmitBtn').textContent = 'Register Client';
+        } else {
+            // Create new
+            response = await createApiCall('POST', '/registrations', data);
+            showSuccess('Registration created successfully!');
+        }
+        
+        clearRegistrationForm();
+        fetchRegistrations();
+    } catch (error) {
+        showError(`Failed to save registration: ${error.message}`);
+    }
+});
