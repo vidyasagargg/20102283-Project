@@ -242,3 +242,21 @@ async function editRegistration(id) {
         showError(`Failed to load registration: ${error.message}`);
     }
 }
+
+/**
+ * Delete a registration with confirmation
+ * @param {number} id - Registration ID
+ */
+async function deleteRegistration(id) {
+    if (!confirm('Are you sure you want to delete this registration and all associated records?')) {
+        return;
+    }
+    
+    try {
+        await createApiCall('DELETE', `/registrations/${id}`);
+        showSuccess('Registration deleted successfully!');
+        fetchRegistrations();
+    } catch (error) {
+        showError(`Failed to delete registration: ${error.message}`);
+    }
+}
