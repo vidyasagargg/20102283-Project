@@ -88,10 +88,7 @@ function showSuccess(message, elementId = null) {
 }
 
 
-// ============================================================================
 // TAB SWITCHING
-// ============================================================================
-
 /**
  * Switch between tabs
  * @param {string} tabName - Tab identifier: 'registrations', 'appointments', 'treatments'
@@ -131,10 +128,8 @@ window.addEventListener('load', function() {
     populateVeterinarianDropdown();
 });
 
-// ============================================================================
-// REGISTRATION FORM HANDLING
-// ============================================================================
 
+// REGISTRATION FORM HANDLING
 document.getElementById('registrationForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -184,3 +179,38 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         showError(`Failed to save registration: ${error.message}`);
     }
 });
+
+/**
+ * Fetch all registrations from API and display in table
+ */
+async function fetchRegistrations() {
+    try {
+        const registrations = await createApiCall('GET', '/registrations');
+        const tbody = document.getElementById('registrationsBody');
+        tbody.innerHTML = '';
+        
+        if (!registrations || registrations.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No registrations found</td></tr>';
+            return;
+        }
+        
+        registrations.forEach(reg => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${reg.id}</td>
+                <td>${reg.owner_name}</td>
+                <td>${reg.owner_phone}</td>
+                <td>${reg.pet_name}</td>
+                <td>${reg.pet_type}</td>
+                <td>
+                    <button onclick="editRegistration(${reg.id})" style="margin-right: 5px;">✏️ Edit</button>
+                    <button onclick="deleteRegistration(${reg.id})" style="margin-right: 5px;">🗑️ Delete</button>
+                    <button onclick="showMedicalCardReport(${reg.id})">📋 Medical Card</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        showError(`Failed to load registrations: ${error.message}`);
+    }
+}
