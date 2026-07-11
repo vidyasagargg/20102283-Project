@@ -744,5 +744,36 @@ document.getElementById('vaccinationForm').addEventListener('submit', async func
     }
 });
 
-
+/**
+ * Fetch vaccinations for specific patient
+ * @param {number} regId - Registration ID
+ */
+async function fetchVaccinationsForPatient(regId) {
+    try {
+        const vaccinations = await createApiCall('GET', `/vaccinations?registration_id=${regId}`);
+        const tbody = document.getElementById('vaccinationsBody');
+        tbody.innerHTML = '';
+        
+        if (!vaccinations || vaccinations.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No vaccinations recorded</td></tr>';
+            return;
+        }
+        
+        vaccinations.forEach(vac => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${vac.id}</td>
+                <td>${vac.pet_name}</td>
+                <td>${vac.vaccination_details}</td>
+                <td>
+                    <button onclick="editVaccination(${vac.id})" style="margin-right: 5px;">✏️ Edit</button>
+                    <button onclick="deleteVaccination(${vac.id})">🗑️ Delete</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        showError(`Failed to load vaccinations: ${error.message}`);
+    }
+}
 
