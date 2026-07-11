@@ -862,3 +862,80 @@ function evaluateHealthStatus(medications, vaccinations) {
     };
 }
 
+/**
+ * Show clinical medical card report for patient(Pet)
+ * @param {number} regId - Registration ID
+ */
+async function showMedicalCardReport(regId) {
+    try {
+        const history = await createApiCall('GET', `/treatments/history?registration_id=${regId}`);
+        
+        const reg = history.registration;
+        const medications = history.medications || [];
+        const vaccinations = history.vaccinations || [];
+        
+        // Evaluate health
+        const healthStatus = evaluateHealthStatus(medications, vaccinations);
+        
+        // Populate modal
+        document.getElementById('reportMetaText').textContent = 
+            `${reg.pet_name} (${reg.pet_type}, Age: ${reg.pet_age}) - Owner: ${reg.owner_name}`;
+        
+        document.getElementById('reportStatusBadge').textContent = healthStatus.status;
+        document.getElementById('reportStatusBadge').style.color = healthStatus.color;
+        
+        document.getElementById('reportRecommendationText').textContent = healthStatus.recommendation;
+        
+        // Build history table
+        const historyBody = document.getElementById('historyBody');
+        historyBody.innerHTML = '';
+        
+        // Add appointments
+        if (history.appointments && history.appointments.length > 0) {
+            history.appointments.forEach(apt => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${apt.id}</td>
+                    <td>Appointment</td>
+                    <td>${apt.veterinarian}</td>
+                    <td>${apt.appointment_date} ${apt.appointment_time}: ${apt.reason}</td>
+                    <td>-</td>
+                `;
+                historyBody.appendChild(row);
+            });
+        }
+        
+        // Add medications
+        medications.forEach(med => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${med.id}</td>
+                <td>Medication</td>
+                <td>${med.veterinarian}</td>
+                <td>${med.medication_details} (${med.frequency})</td>
+                <td>${med.symptoms || '-'}</td>
+            `;
+            historyBody.appendChild(row);
+        });
+        
+        // Add vaccinations
+        vaccinations.forEach(vac => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${vac.id}</td>
+                <td>Vaccination</td>
+                <td>${vac.veterinarian}</td>
+                <td>${vac.vaccination_details} (${vac.vaccination_date})</td>
+                <td>-</td>
+            `;
+            historyBody.appendChild(row);
+        });
+        
+        // Show modal
+        document.getElementById('petHistorySection').style.display = 'block';
+        document.getElementById('petHistorySection').scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        showError(`Failed to load medical card: ${error.message}`);
+    }
+}
+
