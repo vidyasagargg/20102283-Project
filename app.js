@@ -358,3 +358,58 @@ document.getElementById('appointmentForm').addEventListener('submit', async func
         showError(`Failed to save appointment: ${error.message}`);
     }
 });
+
+/**
+ * Fetch all appointments from API and display in table
+ */
+async function fetchAppointments() {
+    try {
+        const appointments = await createApiCall('GET', '/appointments');
+        const tbody = document.getElementById('appointmentsBody');
+        tbody.innerHTML = '';
+        
+        if (!appointments || appointments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No appointments found</td></tr>';
+            return;
+        }
+        
+        appointments.forEach(apt => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${apt.id}</td>
+                <td>${apt.registration_id}</td>
+                <td>${apt.owner_name}</td>
+                <td>${apt.pet_name}</td>
+                <td>${apt.pet_type}</td>
+                <td>${apt.appointment_date}</td>
+                <td>${apt.appointment_time}</td>
+                <td>${apt.veterinarian}</td>
+                <td>${apt.reason}</td>
+                <td>
+                    <button onclick="editAppointment(${apt.id})" style="margin-right: 5px;">✏️ Edit</button>
+                    <button onclick="deleteAppointment(${apt.id})">🗑️ Delete</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        showError(`Failed to load appointments: ${error.message}`);
+    }
+}
+
+/**
+ * Toggle appointments log display
+ */
+function toggleAppointmentsLog() {
+    const container = document.getElementById('appointmentsLogContainer');
+    const btn = document.getElementById('viewAllAppsBtn');
+    
+    if (container.style.display === 'none') {
+        container.style.display = 'block';
+        btn.textContent = 'Hide appointments';
+        fetchAppointments();
+    } else {
+        container.style.display = 'none';
+        btn.textContent = 'View all appointments';
+    }
+}
