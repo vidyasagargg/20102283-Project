@@ -1,7 +1,9 @@
+// ============================================================================
+// PAWS & CLAWS VET CLINIC - FRONTEND APPLICATION
+// ============================================================================
 
 const API_BASE_URL = "http://localhost:5000/api";
 
-// Global state
 let currentTab = 'registrations';
 let editingRegistrationId = null;
 let editingAppointmentId = null;
@@ -9,24 +11,12 @@ let editingMedicationId = null;
 let editingVaccinationId = null;
 let currentPatientRegistrationId = null;
 
-// ============================================================================
 // API HELPER FUNCTIONS
-// ============================================================================
-
-/**
- * Make API call with proper error handling
- * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
- * @param {string} endpoint - API endpoint path (e.g., '/registrations')
- * @param {object} data - Request body data (for POST/PUT)
- * @returns {Promise} API response as JSON
- */
 async function createApiCall(method, endpoint, data = null) {
     try {
         const options = {
             method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
         };
         
         if (data && (method === 'POST' || method === 'PUT')) {
@@ -47,11 +37,6 @@ async function createApiCall(method, endpoint, data = null) {
     }
 }
 
-/**
- * Display error message to user
- * @param {string} message - Error message
- * @param {string} elementId - Element to display error in
- */
 function showError(message, elementId = null) {
     console.error(message);
     if (elementId) {
@@ -59,20 +44,13 @@ function showError(message, elementId = null) {
         if (element) {
             element.textContent = `❌ ${message}`;
             element.style.color = 'red';
-            setTimeout(() => {
-                element.textContent = '';
-            }, 3000);
+            setTimeout(() => { element.textContent = ''; }, 3000);
         }
     } else {
         alert(`Error: ${message}`);
     }
 }
 
-/**
- * Display success message to user
- * @param {string} message - Success message
- * @param {string} elementId - Element to display success in
- */
 function showSuccess(message, elementId = null) {
     console.log(message);
     if (elementId) {
@@ -80,26 +58,18 @@ function showSuccess(message, elementId = null) {
         if (element) {
             element.textContent = `✅ ${message}`;
             element.style.color = 'green';
-            setTimeout(() => {
-                element.textContent = '';
-            }, 3000);
+            setTimeout(() => { element.textContent = ''; }, 3000);
         }
     }
 }
 
 
 // TAB SWITCHING
-/**
- * Switch between tabs
- * @param {string} tabName - Tab identifier: 'registrations', 'appointments', 'treatments'
- */
 function switchTab(tabName) {
-    // Hide all tabs
     document.getElementById('sectionRegistrations').style.display = 'none';
     document.getElementById('sectionAppointments').style.display = 'none';
     document.getElementById('sectionTreatments').style.display = 'none';
     
-    // Show selected tab
     switch(tabName) {
         case 'registrations':
             document.getElementById('sectionRegistrations').style.display = 'block';
@@ -116,18 +86,15 @@ function switchTab(tabName) {
             break;
     }
     
-    // Update button styles
     document.getElementById('tabBtnRegistrations').style.fontWeight = tabName === 'registrations' ? 'bold' : 'normal';
     document.getElementById('tabBtnAppointments').style.fontWeight = tabName === 'appointments' ? 'bold' : 'normal';
     document.getElementById('tabBtnTreatments').style.fontWeight = tabName === 'treatments' ? 'bold' : 'normal';
 }
 
-// Initialize on page load
 window.addEventListener('load', function() {
     switchTab('registrations');
     populateVeterinarianDropdown();
 });
-
 
 // REGISTRATION FORM HANDLING
 document.getElementById('registrationForm').addEventListener('submit', async function(e) {
@@ -140,7 +107,6 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     const petType = document.getElementById('regPetType').value;
     const petAge = parseInt(document.getElementById('regPetAge').value);
     
-    // Validation
     if (!ownerName.trim()) {
         showError('Owner name is required');
         return;
@@ -159,17 +125,13 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
             pet_age: petAge
         };
         
-        let response;
         if (regId) {
-            // Update existing
-            response = await createApiCall('PUT', `/registrations/${regId}`, data);
+            await createApiCall('PUT', `/registrations/${regId}`, data);
             showSuccess('Registration updated successfully!');
-            editingRegistrationId = null;
             document.getElementById('regCancelBtn').style.display = 'none';
             document.getElementById('regSubmitBtn').textContent = 'Register Client';
         } else {
-            // Create new
-            response = await createApiCall('POST', '/registrations', data);
+            await createApiCall('POST', '/registrations', data);
             showSuccess('Registration created successfully!');
         }
         
@@ -180,9 +142,6 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     }
 });
 
-/**
- * Fetch all registrations from API and display in table
- */
 async function fetchRegistrations() {
     try {
         const registrations = await createApiCall('GET', '/registrations');
@@ -215,10 +174,6 @@ async function fetchRegistrations() {
     }
 }
 
-/**
- * Load registration for editing
- * @param {number} id - Registration ID
- */
 async function editRegistration(id) {
     try {
         const registration = await createApiCall('GET', `/registrations/${id}`);
@@ -230,23 +185,16 @@ async function editRegistration(id) {
         document.getElementById('regPetType').value = registration.pet_type;
         document.getElementById('regPetAge').value = registration.pet_age;
         
-        // Show cancel button, change submit text
         document.getElementById('regCancelBtn').style.display = 'inline-block';
         document.getElementById('regSubmitBtn').textContent = 'Update Registration';
         
         editingRegistrationId = id;
-        
-        // Scroll to form
         document.getElementById('registrationForm').scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
         showError(`Failed to load registration: ${error.message}`);
     }
 }
 
-/**
- * Delete a registration with confirmation
- * @param {number} id - Registration ID
- */
 async function deleteRegistration(id) {
     if (!confirm('Are you sure you want to delete this registration and all associated records?')) {
         return;
@@ -262,10 +210,6 @@ async function deleteRegistration(id) {
 }
 
 // APPOINTMENT FORM HANDLING
-
-/**
- * Verify registration exists and auto-populate appointment form
- */
 async function verifyAndPopulateRegistration() {
     const regId = document.getElementById('appRegId').value;
     const feedback = document.getElementById('validationFeedback');
@@ -311,7 +255,6 @@ document.getElementById('appointmentForm').addEventListener('submit', async func
     const vet = document.getElementById('appVet').value;
     const reason = document.getElementById('appReason').value;
     
-    // Validation
     if (!regId) {
         showError('Registration ID is required');
         return;
@@ -341,14 +284,13 @@ document.getElementById('appointmentForm').addEventListener('submit', async func
             reason: reason
         };
         
-        let response;
         if (appId) {
-            response = await createApiCall('PUT', `/appointments/${appId}`, data);
+            await createApiCall('PUT', `/appointments/${appId}`, data);
             showSuccess('Appointment updated successfully!', 'appointmentSuccessMessage');
             document.getElementById('appCancelBtn').style.display = 'none';
             document.getElementById('appSubmitBtn').textContent = 'Save Appointment';
         } else {
-            response = await createApiCall('POST', '/appointments', data);
+            await createApiCall('POST', '/appointments', data);
             showSuccess('Appointment created successfully!', 'appointmentSuccessMessage');
         }
         
@@ -359,9 +301,6 @@ document.getElementById('appointmentForm').addEventListener('submit', async func
     }
 });
 
-/**
- * Fetch all appointments from API and display in table
- */
 async function fetchAppointments() {
     try {
         const appointments = await createApiCall('GET', '/appointments');
@@ -397,9 +336,6 @@ async function fetchAppointments() {
     }
 }
 
-/**
- * Toggle appointments log display
- */
 function toggleAppointmentsLog() {
     const container = document.getElementById('appointmentsLogContainer');
     const btn = document.getElementById('viewAllAppsBtn');
@@ -414,10 +350,6 @@ function toggleAppointmentsLog() {
     }
 }
 
-/**
- * Load appointment for editing
- * @param {number} id - Appointment ID
- */
 async function editAppointment(id) {
     try {
         const appointment = await createApiCall('GET', `/appointments/${id}`);
@@ -441,10 +373,6 @@ async function editAppointment(id) {
     }
 }
 
-/**
- * Delete an appointment with confirmation
- * @param {number} id - Appointment ID
- */
 async function deleteAppointment(id) {
     if (!confirm('Are you sure you want to delete this appointment?')) {
         return;
@@ -459,11 +387,7 @@ async function deleteAppointment(id) {
     }
 }
 
-
 // TREATMENT/MEDICATION/VACCINATION HANDLING
-/**
- * Verify registration and populate treatment form context
- */
 async function verifyAndPopulateConsultation() {
     const regId = document.getElementById('treatRegId').value;
     const feedback = document.getElementById('treatmentFeedback');
@@ -483,7 +407,6 @@ async function verifyAndPopulateConsultation() {
         document.getElementById('treatOwnerName').value = registration.owner_name;
         document.getElementById('treatPetName').value = registration.pet_name;
         
-        // Get latest appointment for veterinarian
         const appointments = await createApiCall('GET', `/appointments?registration_id=${regId}`);
         if (appointments && appointments.length > 0) {
             const latestApt = appointments[appointments.length - 1];
@@ -499,7 +422,6 @@ async function verifyAndPopulateConsultation() {
         medBtn.disabled = false;
         vacBtn.disabled = false;
         
-        // Fetch medications and vaccinations for this patient
         fetchMedicationsForPatient(regId);
         fetchVaccinationsForPatient(regId);
     } catch (error) {
@@ -516,9 +438,6 @@ async function verifyAndPopulateConsultation() {
     }
 }
 
-/**
- * Reset patient context
- */
 function resetPatientContext() {
     document.getElementById('treatRegId').value = '';
     document.getElementById('treatOwnerName').value = '';
@@ -532,9 +451,6 @@ function resetPatientContext() {
     currentPatientRegistrationId = null;
 }
 
-/**
- * Check clinical safety rules for medications
- */
 function checkClinicalSafetyRules() {
     const medDetails = document.getElementById('treatMeds').value.toLowerCase();
     const warningMsg = document.getElementById('safetyWarningMessage');
@@ -546,7 +462,6 @@ function checkClinicalSafetyRules() {
         return;
     }
     
-    // Check for high-risk keywords
     const highRiskKeywords = ['overdose', 'poison', 'toxic', 'critical'];
     const hasHighRisk = highRiskKeywords.some(keyword => medDetails.includes(keyword));
     
@@ -560,7 +475,6 @@ function checkClinicalSafetyRules() {
     submitBtn.disabled = false;
 }
 
-//Implementing medication form submission
 document.getElementById('medicationForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -597,14 +511,13 @@ document.getElementById('medicationForm').addEventListener('submit', async funct
             symptoms: symptoms
         };
         
-        let response;
         if (medId) {
-            response = await createApiCall('PUT', `/medications/${medId}`, data);
+            await createApiCall('PUT', `/medications/${medId}`, data);
             showSuccess('Medication updated successfully!');
             document.getElementById('medCancelBtn').style.display = 'none';
             document.getElementById('medSubmitBtn').textContent = 'Append Medicine Entry';
         } else {
-            response = await createApiCall('POST', '/medications', data);
+            await createApiCall('POST', '/medications', data);
             showSuccess('Medication recorded successfully!');
         }
         
@@ -615,10 +528,6 @@ document.getElementById('medicationForm').addEventListener('submit', async funct
     }
 });
 
-/**
- * Fetch medications for specific patient
- * @param {number} regId - Registration ID
- */
 async function fetchMedicationsForPatient(regId) {
     try {
         const medications = await createApiCall('GET', `/medications?registration_id=${regId}`);
@@ -649,10 +558,6 @@ async function fetchMedicationsForPatient(regId) {
     }
 }
 
-/**
- * Load medication for editing
- * @param {number} id - Medication ID
- */
 async function editMedication(id) {
     try {
         const medication = await createApiCall('GET', `/medications/${id}`);
@@ -671,10 +576,6 @@ async function editMedication(id) {
     }
 }
 
-/**
- * Delete a medication with confirmation
- * @param {number} id - Medication ID
- */
 async function deleteMedication(id) {
     if (!confirm('Are you sure you want to delete this medication record?')) {
         return;
@@ -691,7 +592,6 @@ async function deleteMedication(id) {
     }
 }
 
-// Implementing logic for vaccination submission
 document.getElementById('vaccinationForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -726,14 +626,13 @@ document.getElementById('vaccinationForm').addEventListener('submit', async func
             vaccination_date: vacDate
         };
         
-        let response;
         if (vacId) {
-            response = await createApiCall('PUT', `/vaccinations/${vacId}`, data);
+            await createApiCall('PUT', `/vaccinations/${vacId}`, data);
             showSuccess('Vaccination updated successfully!');
             document.getElementById('vacCancelBtn').style.display = 'none';
             document.getElementById('vacSubmitBtn').textContent = 'Append Vaccination Entry';
         } else {
-            response = await createApiCall('POST', '/vaccinations', data);
+            await createApiCall('POST', '/vaccinations', data);
             showSuccess('Vaccination recorded successfully!');
         }
         
@@ -744,10 +643,6 @@ document.getElementById('vaccinationForm').addEventListener('submit', async func
     }
 });
 
-/**
- * Fetch vaccinations for specific patient
- * @param {number} regId - Registration ID
- */
 async function fetchVaccinationsForPatient(regId) {
     try {
         const vaccinations = await createApiCall('GET', `/vaccinations?registration_id=${regId}`);
@@ -777,10 +672,6 @@ async function fetchVaccinationsForPatient(regId) {
     }
 }
 
-/**
- * Load vaccination for editing
- * @param {number} id - Vaccination ID
- */
 async function editVaccination(id) {
     try {
         const vaccination = await createApiCall('GET', `/vaccinations/${id}`);
@@ -798,10 +689,6 @@ async function editVaccination(id) {
     }
 }
 
-/**
- * Delete a vaccination with confirmation
- * @param {number} id - Vaccination ID
- */
 async function deleteVaccination(id) {
     if (!confirm('Are you sure you want to delete this vaccination record?')) {
         return;
@@ -818,12 +705,7 @@ async function deleteVaccination(id) {
     }
 }
 
-/**
- * Evaluate pet health status
- * @param {array} medications - Medication records
- * @param {array} vaccinations - Vaccination records
- * @returns {object} Status and recommendation
- */
+// CLINICAL REPORTING
 function evaluateHealthStatus(medications, vaccinations) {
     if (!medications || medications.length === 0) {
         if (!vaccinations || vaccinations.length === 0) {
@@ -840,7 +722,6 @@ function evaluateHealthStatus(medications, vaccinations) {
         };
     }
     
-    // Check for urgent symptoms
     const urgentKeywords = ['fever', 'poison', 'severe', 'emergency', 'critical'];
     for (let med of medications) {
         if (med.symptoms) {
@@ -862,10 +743,6 @@ function evaluateHealthStatus(medications, vaccinations) {
     };
 }
 
-/**
- * Show clinical medical card report for patient(Pet)
- * @param {number} regId - Registration ID
- */
 async function showMedicalCardReport(regId) {
     try {
         const history = await createApiCall('GET', `/treatments/history?registration_id=${regId}`);
@@ -874,10 +751,8 @@ async function showMedicalCardReport(regId) {
         const medications = history.medications || [];
         const vaccinations = history.vaccinations || [];
         
-        // Evaluate health
         const healthStatus = evaluateHealthStatus(medications, vaccinations);
         
-        // Populate modal
         document.getElementById('reportMetaText').textContent = 
             `${reg.pet_name} (${reg.pet_type}, Age: ${reg.pet_age}) - Owner: ${reg.owner_name}`;
         
@@ -886,11 +761,9 @@ async function showMedicalCardReport(regId) {
         
         document.getElementById('reportRecommendationText').textContent = healthStatus.recommendation;
         
-        // Build history table
         const historyBody = document.getElementById('historyBody');
         historyBody.innerHTML = '';
         
-        // Add appointments
         if (history.appointments && history.appointments.length > 0) {
             history.appointments.forEach(apt => {
                 const row = document.createElement('tr');
@@ -905,7 +778,6 @@ async function showMedicalCardReport(regId) {
             });
         }
         
-        // Add medications
         medications.forEach(med => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -918,7 +790,6 @@ async function showMedicalCardReport(regId) {
             historyBody.appendChild(row);
         });
         
-        // Add vaccinations
         vaccinations.forEach(vac => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -931,7 +802,6 @@ async function showMedicalCardReport(regId) {
             historyBody.appendChild(row);
         });
         
-        // Show modal
         document.getElementById('petHistorySection').style.display = 'block';
         document.getElementById('petHistorySection').scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
@@ -939,10 +809,7 @@ async function showMedicalCardReport(regId) {
     }
 }
 
-// Adding FORM CLEARING FUNCTIONS
-/**
- * Clear registration form
- */
+// FORM CLEARING FUNCTIONS
 function clearRegistrationForm() {
     document.getElementById('registrationForm').reset();
     document.getElementById('regId').value = '';
@@ -951,9 +818,6 @@ function clearRegistrationForm() {
     editingRegistrationId = null;
 }
 
-/**
- * Clear appointment form
- */
 function clearAppointmentForm() {
     document.getElementById('appointmentForm').reset();
     document.getElementById('appId').value = '';
@@ -963,9 +827,6 @@ function clearAppointmentForm() {
     editingAppointmentId = null;
 }
 
-/**
- * Clear medication form
- */
 function clearMedicationFormOnly() {
     document.getElementById('medicationForm').reset();
     document.getElementById('medId').value = '';
@@ -975,9 +836,6 @@ function clearMedicationFormOnly() {
     editingMedicationId = null;
 }
 
-/**
- * Clear vaccination form
- */
 function clearVaccinationFormOnly() {
     document.getElementById('vaccinationForm').reset();
     document.getElementById('vacId').value = '';
@@ -986,3 +844,18 @@ function clearVaccinationFormOnly() {
     editingVaccinationId = null;
 }
 
+function populateVeterinarianDropdown() {
+    const vetSelect = document.getElementById('appVet');
+    const vets = [
+        'Dr. Sarah Jenkins',
+        'Dr. Alex Carter',
+        'Dr. Emily Ross'
+    ];
+    
+    vets.forEach(vet => {
+        const option = document.createElement('option');
+        option.value = vet;
+        option.textContent = vet;
+        vetSelect.appendChild(option);
+    });
+}
