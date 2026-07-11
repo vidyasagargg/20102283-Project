@@ -458,3 +458,76 @@ async function deleteAppointment(id) {
         showError(`Failed to delete appointment: ${error.message}`);
     }
 }
+
+
+// TREATMENT/MEDICATION/VACCINATION HANDLING
+/**
+ * Verify registration and populate treatment form context
+ */
+async function verifyAndPopulateConsultation() {
+    const regId = document.getElementById('treatRegId').value;
+    const feedback = document.getElementById('treatmentFeedback');
+    const medBtn = document.getElementById('medSubmitBtn');
+    const vacBtn = document.getElementById('vacSubmitBtn');
+    
+    if (!regId) {
+        feedback.textContent = '';
+        medBtn.disabled = true;
+        vacBtn.disabled = true;
+        return;
+    }
+    
+    try {
+        const registration = await createApiCall('GET', `/registrations/${regId}`);
+        
+        document.getElementById('treatOwnerName').value = registration.owner_name;
+        document.getElementById('treatPetName').value = registration.pet_name;
+        
+        // Get latest appointment for veterinarian
+        const appointments = await createApiCall('GET', `/appointments?registration_id=${regId}`);
+        if (appointments && appointments.length > 0) {
+            const latestApt = appointments[appointments.length - 1];
+            document.getElementById('treatVet').value = latestApt.veterinarian;
+        } else {
+            document.getElementById('treatVet').value = 'Not assigned';
+        }
+        
+        currentPatientRegistrationId = regId;
+        
+        feedback.textContent = '✅ Patient found!';
+        feedback.style.color = 'green';
+        medBtn.disabled = false;
+        vacBtn.disabled = false;
+        
+        // Fetch medications and vaccinations for this patient
+        fetchMedicationsForPatient(regId);
+        fetchVaccinationsForPatient(regId);
+    } catch (error) {
+        document.getElementById('treatOwnerName').value = '';
+        document.getElementById('treatPetName').value = '';
+        document.getElementById('treatVet').value = '';
+        
+        feedback.textContent = '❌ Patient not found';
+        feedback.style.color = 'red';
+        medBtn.disabled = true;
+        vacBtn.disabled = true;
+        
+        currentPatientRegistrationId = null;
+    }
+}
+
+/**
+ * Reset patient context
+ */
+function resetPatientContext() {
+    document.getElementById('treatRegId').value = '';
+    document.getElementById('treatOwnerName').value = '';
+    document.getElementById('treatPetName').value = '';
+    document.getElementById('treatVet').value = '';
+    document.getElementById('treatmentFeedback').textContent = '';
+    document.getElementById('medSubmitBtn').disabled = true;
+    document.getElementById('vacSubmitBtn').disabled = true;
+    document.getElementById('medicationsBody').innerHTML = '';
+    document.getElementById('vaccinationsBody').innerHTML = '';
+    currentPatientRegistrationId = null;
+}
