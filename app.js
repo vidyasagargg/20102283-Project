@@ -777,3 +777,46 @@ async function fetchVaccinationsForPatient(regId) {
     }
 }
 
+/**
+ * Load vaccination for editing
+ * @param {number} id - Vaccination ID
+ */
+async function editVaccination(id) {
+    try {
+        const vaccination = await createApiCall('GET', `/vaccinations/${id}`);
+        
+        document.getElementById('vacId').value = vaccination.id;
+        document.getElementById('treatVacs').value = vaccination.vaccination_details;
+        document.getElementById('treatVacDate').value = vaccination.vaccination_date;
+        
+        document.getElementById('vacCancelBtn').style.display = 'inline-block';
+        document.getElementById('vacSubmitBtn').textContent = 'Update Vaccination Entry';
+        
+        document.getElementById('vaccinationForm').scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        showError(`Failed to load vaccination: ${error.message}`);
+    }
+}
+
+/**
+ * Delete a vaccination with confirmation
+ * @param {number} id - Vaccination ID
+ */
+async function deleteVaccination(id) {
+    if (!confirm('Are you sure you want to delete this vaccination record?')) {
+        return;
+    }
+    
+    try {
+        await createApiCall('DELETE', `/vaccinations/${id}`);
+        showSuccess('Vaccination deleted successfully!');
+        if (currentPatientRegistrationId) {
+            fetchVaccinationsForPatient(currentPatientRegistrationId);
+        }
+    } catch (error) {
+        showError(`Failed to delete vaccination: ${error.message}`);
+    }
+}
+
+
+
