@@ -649,3 +649,45 @@ async function fetchMedicationsForPatient(regId) {
     }
 }
 
+/**
+ * Load medication for editing
+ * @param {number} id - Medication ID
+ */
+async function editMedication(id) {
+    try {
+        const medication = await createApiCall('GET', `/medications/${id}`);
+        
+        document.getElementById('medId').value = medication.id;
+        document.getElementById('treatMeds').value = medication.medication_details;
+        document.getElementById('treatFreq').value = medication.frequency;
+        document.getElementById('treatSymptoms').value = medication.symptoms || '';
+        
+        document.getElementById('medCancelBtn').style.display = 'inline-block';
+        document.getElementById('medSubmitBtn').textContent = 'Update Medicine Entry';
+        
+        document.getElementById('medicationForm').scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        showError(`Failed to load medication: ${error.message}`);
+    }
+}
+
+/**
+ * Delete a medication with confirmation
+ * @param {number} id - Medication ID
+ */
+async function deleteMedication(id) {
+    if (!confirm('Are you sure you want to delete this medication record?')) {
+        return;
+    }
+    
+    try {
+        await createApiCall('DELETE', `/medications/${id}`);
+        showSuccess('Medication deleted successfully!');
+        if (currentPatientRegistrationId) {
+            fetchMedicationsForPatient(currentPatientRegistrationId);
+        }
+    } catch (error) {
+        showError(`Failed to delete medication: ${error.message}`);
+    }
+}
+
