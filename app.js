@@ -615,4 +615,37 @@ document.getElementById('medicationForm').addEventListener('submit', async funct
     }
 });
 
+/**
+ * Fetch medications for specific patient
+ * @param {number} regId - Registration ID
+ */
+async function fetchMedicationsForPatient(regId) {
+    try {
+        const medications = await createApiCall('GET', `/medications?registration_id=${regId}`);
+        const tbody = document.getElementById('medicationsBody');
+        tbody.innerHTML = '';
+        
+        if (!medications || medications.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No medications recorded</td></tr>';
+            return;
+        }
+        
+        medications.forEach(med => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${med.id}</td>
+                <td>${med.pet_name}</td>
+                <td>${med.medication_details}</td>
+                <td>${med.frequency}</td>
+                <td>
+                    <button onclick="editMedication(${med.id})" style="margin-right: 5px;">✏️ Edit</button>
+                    <button onclick="deleteMedication(${med.id})">🗑️ Delete</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        showError(`Failed to load medications: ${error.message}`);
+    }
+}
 
