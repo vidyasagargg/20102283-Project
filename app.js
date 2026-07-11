@@ -560,4 +560,59 @@ function checkClinicalSafetyRules() {
     submitBtn.disabled = false;
 }
 
+//Implementing medication form submission
+document.getElementById('medicationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const medId = document.getElementById('medId').value;
+    const regId = currentPatientRegistrationId;
+    const ownerName = document.getElementById('treatOwnerName').value;
+    const petName = document.getElementById('treatPetName').value;
+    const vet = document.getElementById('treatVet').value;
+    const medDetails = document.getElementById('treatMeds').value;
+    const frequency = document.getElementById('treatFreq').value;
+    const symptoms = document.getElementById('treatSymptoms').value;
+    
+    if (!regId) {
+        showError('Please select a patient first');
+        return;
+    }
+    if (!medDetails.trim()) {
+        showError('Medication details are required');
+        return;
+    }
+    if (!frequency) {
+        showError('Frequency is required');
+        return;
+    }
+    
+    try {
+        const data = {
+            registration_id: parseInt(regId),
+            owner_name: ownerName,
+            pet_name: petName,
+            veterinarian: vet,
+            medication_details: medDetails,
+            frequency: frequency,
+            symptoms: symptoms
+        };
+        
+        let response;
+        if (medId) {
+            response = await createApiCall('PUT', `/medications/${medId}`, data);
+            showSuccess('Medication updated successfully!');
+            document.getElementById('medCancelBtn').style.display = 'none';
+            document.getElementById('medSubmitBtn').textContent = 'Append Medicine Entry';
+        } else {
+            response = await createApiCall('POST', '/medications', data);
+            showSuccess('Medication recorded successfully!');
+        }
+        
+        clearMedicationFormOnly();
+        fetchMedicationsForPatient(regId);
+    } catch (error) {
+        showError(`Failed to save medication: ${error.message}`);
+    }
+});
+
 
