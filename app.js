@@ -297,3 +297,64 @@ async function verifyAndPopulateRegistration() {
         submitBtn.disabled = true;
     }
 }
+
+document.getElementById('appointmentForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const appId = document.getElementById('appId').value;
+    const regId = document.getElementById('appRegId').value;
+    const ownerName = document.getElementById('appOwnerName').value;
+    const petName = document.getElementById('appPetName').value;
+    const petType = document.getElementById('appPetType').value;
+    const appDate = document.getElementById('appDate').value;
+    const appTime = document.getElementById('appTime').value;
+    const vet = document.getElementById('appVet').value;
+    const reason = document.getElementById('appReason').value;
+    
+    // Validation
+    if (!regId) {
+        showError('Registration ID is required');
+        return;
+    }
+    if (!appDate) {
+        showError('Appointment date is required');
+        return;
+    }
+    if (!appTime) {
+        showError('Appointment time is required');
+        return;
+    }
+    if (!vet) {
+        showError('Veterinarian is required');
+        return;
+    }
+    
+    try {
+        const data = {
+            registration_id: parseInt(regId),
+            owner_name: ownerName,
+            pet_name: petName,
+            pet_type: petType,
+            appointment_date: appDate,
+            appointment_time: appTime,
+            veterinarian: vet,
+            reason: reason
+        };
+        
+        let response;
+        if (appId) {
+            response = await createApiCall('PUT', `/appointments/${appId}`, data);
+            showSuccess('Appointment updated successfully!', 'appointmentSuccessMessage');
+            document.getElementById('appCancelBtn').style.display = 'none';
+            document.getElementById('appSubmitBtn').textContent = 'Save Appointment';
+        } else {
+            response = await createApiCall('POST', '/appointments', data);
+            showSuccess('Appointment created successfully!', 'appointmentSuccessMessage');
+        }
+        
+        clearAppointmentForm();
+        fetchAppointments();
+    } catch (error) {
+        showError(`Failed to save appointment: ${error.message}`);
+    }
+});
