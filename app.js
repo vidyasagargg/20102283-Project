@@ -818,5 +818,47 @@ async function deleteVaccination(id) {
     }
 }
 
-
+/**
+ * Evaluate pet health status
+ * @param {array} medications - Medication records
+ * @param {array} vaccinations - Vaccination records
+ * @returns {object} Status and recommendation
+ */
+function evaluateHealthStatus(medications, vaccinations) {
+    if (!medications || medications.length === 0) {
+        if (!vaccinations || vaccinations.length === 0) {
+            return {
+                status: '🟢 Healthy',
+                recommendation: 'Schedule routine check-up',
+                color: 'green'
+            };
+        }
+        return {
+            status: '🟢 Healthy',
+            recommendation: 'Vaccinations up to date',
+            color: 'green'
+        };
+    }
+    
+    // Check for urgent symptoms
+    const urgentKeywords = ['fever', 'poison', 'severe', 'emergency', 'critical'];
+    for (let med of medications) {
+        if (med.symptoms) {
+            const symptomsLower = med.symptoms.toLowerCase();
+            if (urgentKeywords.some(kw => symptomsLower.includes(kw))) {
+                return {
+                    status: '🔴 Needs Attention',
+                    recommendation: 'Immediate veterinary consultation recommended',
+                    color: 'red'
+                };
+            }
+        }
+    }
+    
+    return {
+        status: '🟡 In Treatment',
+        recommendation: 'Continue current medication regimen',
+        color: 'orange'
+    };
+}
 
