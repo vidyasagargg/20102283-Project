@@ -260,3 +260,40 @@ async function deleteRegistration(id) {
         showError(`Failed to delete registration: ${error.message}`);
     }
 }
+
+// APPOINTMENT FORM HANDLING
+
+/**
+ * Verify registration exists and auto-populate appointment form
+ */
+async function verifyAndPopulateRegistration() {
+    const regId = document.getElementById('appRegId').value;
+    const feedback = document.getElementById('validationFeedback');
+    const submitBtn = document.getElementById('appSubmitBtn');
+    
+    if (!regId) {
+        feedback.textContent = '';
+        submitBtn.disabled = true;
+        return;
+    }
+    
+    try {
+        const registration = await createApiCall('GET', `/registrations/${regId}`);
+        
+        document.getElementById('appOwnerName').value = registration.owner_name;
+        document.getElementById('appPetName').value = registration.pet_name;
+        document.getElementById('appPetType').value = registration.pet_type;
+        
+        feedback.textContent = '✅ Registration found!';
+        feedback.style.color = 'green';
+        submitBtn.disabled = false;
+    } catch (error) {
+        document.getElementById('appOwnerName').value = '';
+        document.getElementById('appPetName').value = '';
+        document.getElementById('appPetType').value = '';
+        
+        feedback.textContent = '❌ Registration not found';
+        feedback.style.color = 'red';
+        submitBtn.disabled = true;
+    }
+}
