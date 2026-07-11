@@ -939,3 +939,50 @@ async function showMedicalCardReport(regId) {
     }
 }
 
+// Adding FORM CLEARING FUNCTIONS
+/**
+ * Clear registration form
+ */
+function clearRegistrationForm() {
+    document.getElementById('registrationForm').reset();
+    document.getElementById('regId').value = '';
+    document.getElementById('regCancelBtn').style.display = 'none';
+    document.getElementById('regSubmitBtn').textContent = 'Register Client';
+    editingRegistrationId = null;
+}
+
+/**
+ * Clear appointment form
+ */
+function clearAppointmentForm() {
+    document.getElementById('appointmentForm').reset();
+    document.getElementById('appId').value = '';
+    document.getElementById('appCancelBtn').style.display = 'none';
+    document.getElementById('appSubmitBtn').textContent = 'Save Appointment';
+    document.getElementById('validationFeedback').textContent = '';
+    editingAppointmentId = null;
+}
+
+/**
+ * Clear medication form
+ */
+function clearMedicationFormOnly() {
+    document.getElementById('medicationForm').reset();
+    document.getElementById('medId').value = '';
+    document.getElementById('medCancelBtn').style.display = 'none';
+    document.getElementById('medSubmitBtn').textContent = 'Append Medicine Entry';
+    document.getElementById('safetyWarningMessage').textContent = '';
+    editingMedicationId = null;
+}
+
+/**
+ * Clear vaccination form
+ */
+function clearVaccinationFormOnly() {
+    document.getElementById('vaccinationForm').reset();
+    document.getElementById('vacId').value = '';
+    document.getElementById('vacCancelBtn').style.display = 'none';
+    document.getElementById('vacSubmitBtn').textContent = 'Append Vaccination Entry';
+    editingVaccinationId = null;
+}
+
