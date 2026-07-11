@@ -691,3 +691,58 @@ async function deleteMedication(id) {
     }
 }
 
+// Implementing logic for vaccination submission
+document.getElementById('vaccinationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const vacId = document.getElementById('vacId').value;
+    const regId = currentPatientRegistrationId;
+    const ownerName = document.getElementById('treatOwnerName').value;
+    const petName = document.getElementById('treatPetName').value;
+    const vet = document.getElementById('treatVet').value;
+    const vacDetails = document.getElementById('treatVacs').value;
+    const vacDate = document.getElementById('treatVacDate').value;
+    
+    if (!regId) {
+        showError('Please select a patient first');
+        return;
+    }
+    if (!vacDetails.trim()) {
+        showError('Vaccination details are required');
+        return;
+    }
+    if (!vacDate) {
+        showError('Vaccination date is required');
+        return;
+    }
+    
+    try {
+        const data = {
+            registration_id: parseInt(regId),
+            owner_name: ownerName,
+            pet_name: petName,
+            veterinarian: vet,
+            vaccination_details: vacDetails,
+            vaccination_date: vacDate
+        };
+        
+        let response;
+        if (vacId) {
+            response = await createApiCall('PUT', `/vaccinations/${vacId}`, data);
+            showSuccess('Vaccination updated successfully!');
+            document.getElementById('vacCancelBtn').style.display = 'none';
+            document.getElementById('vacSubmitBtn').textContent = 'Append Vaccination Entry';
+        } else {
+            response = await createApiCall('POST', '/vaccinations', data);
+            showSuccess('Vaccination recorded successfully!');
+        }
+        
+        clearVaccinationFormOnly();
+        fetchVaccinationsForPatient(regId);
+    } catch (error) {
+        showError(`Failed to save vaccination: ${error.message}`);
+    }
+});
+
+
+
