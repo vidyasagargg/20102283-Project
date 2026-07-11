@@ -413,3 +413,48 @@ function toggleAppointmentsLog() {
         btn.textContent = 'View all appointments';
     }
 }
+
+/**
+ * Load appointment for editing
+ * @param {number} id - Appointment ID
+ */
+async function editAppointment(id) {
+    try {
+        const appointment = await createApiCall('GET', `/appointments/${id}`);
+        
+        document.getElementById('appId').value = appointment.id;
+        document.getElementById('appRegId').value = appointment.registration_id;
+        document.getElementById('appOwnerName').value = appointment.owner_name;
+        document.getElementById('appPetName').value = appointment.pet_name;
+        document.getElementById('appPetType').value = appointment.pet_type;
+        document.getElementById('appDate').value = appointment.appointment_date;
+        document.getElementById('appTime').value = appointment.appointment_time;
+        document.getElementById('appVet').value = appointment.veterinarian;
+        document.getElementById('appReason').value = appointment.reason;
+        
+        document.getElementById('appCancelBtn').style.display = 'inline-block';
+        document.getElementById('appSubmitBtn').textContent = 'Update Appointment';
+        
+        document.getElementById('appointmentForm').scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        showError(`Failed to load appointment: ${error.message}`);
+    }
+}
+
+/**
+ * Delete an appointment with confirmation
+ * @param {number} id - Appointment ID
+ */
+async function deleteAppointment(id) {
+    if (!confirm('Are you sure you want to delete this appointment?')) {
+        return;
+    }
+    
+    try {
+        await createApiCall('DELETE', `/appointments/${id}`);
+        showSuccess('Appointment deleted successfully!');
+        fetchAppointments();
+    } catch (error) {
+        showError(`Failed to delete appointment: ${error.message}`);
+    }
+}
