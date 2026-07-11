@@ -531,3 +531,33 @@ function resetPatientContext() {
     document.getElementById('vaccinationsBody').innerHTML = '';
     currentPatientRegistrationId = null;
 }
+
+/**
+ * Check clinical safety rules for medications
+ */
+function checkClinicalSafetyRules() {
+    const medDetails = document.getElementById('treatMeds').value.toLowerCase();
+    const warningMsg = document.getElementById('safetyWarningMessage');
+    const submitBtn = document.getElementById('medSubmitBtn');
+    
+    if (!medDetails.trim()) {
+        submitBtn.disabled = true;
+        warningMsg.textContent = '';
+        return;
+    }
+    
+    // Check for high-risk keywords
+    const highRiskKeywords = ['overdose', 'poison', 'toxic', 'critical'];
+    const hasHighRisk = highRiskKeywords.some(keyword => medDetails.includes(keyword));
+    
+    if (hasHighRisk) {
+        warningMsg.textContent = '⚠️ WARNING: High-risk medication detected. Verify veterinarian approval.';
+        warningMsg.style.color = 'red';
+    } else {
+        warningMsg.textContent = '';
+    }
+    
+    submitBtn.disabled = false;
+}
+
+
