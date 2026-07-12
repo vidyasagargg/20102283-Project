@@ -10,7 +10,21 @@ app.config['DEBUG'] = True
 
 DB_FILE = "vet_clinic.db"
 
+import time
 
+@app.before_request
+def log_request():
+    """Log incoming requests"""
+    request.start_time = time.time()
+    print(f"\n→ [{request.method}] {request.path} from {request.remote_addr}")
+
+@app.after_request
+def log_response(response):
+    """Log response and timing"""
+    if hasattr(request, 'start_time'):
+        elapsed = time.time() - request.start_time
+        print(f"← [{response.status_code}] {request.path} ({elapsed:.3f}s)")
+    return response
 
 def init_db():
     #Initialize database with all required tables
