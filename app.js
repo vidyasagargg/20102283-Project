@@ -475,6 +475,7 @@ function checkClinicalSafetyRules() {
     submitBtn.disabled = false;
 }
 
+
 document.getElementById('medicationForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
