@@ -1,5 +1,3 @@
-<!--Need to update code logic for front end here -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,22 +7,14 @@
 <body>
     <h1>Paws & Claws Vet Clinic Management System</h1>
     
-    <script src="app.js"></script>
-</body>
-</html>
-
-
-#Adding Navigation logic betweem tabs
-<nav>
+    <nav>
         <button id="tabBtnRegistrations" onclick="switchTab('registrations')"><b>1. Owner & Pet Registration</b></button>
         <button id="tabBtnAppointments" onclick="switchTab('appointments')"><b>2. Appointment Booking</b></button>
         <button id="tabBtnTreatments" onclick="switchTab('treatments')"><b>3. Medication & Vaccination</b></button>
     </nav>
     <hr>
 
-
-<!--Adding logic to get all the registration info -->
-<!--First Tab: OWNER & PET REGISTRATION -->
+    <!-- TAB 1: OWNER & PET REGISTRATION -->
     <div id="sectionRegistrations">
         <h2>Register / Edit Owner & Pet Profile</h2>
         <form id="registrationForm">
@@ -39,8 +29,8 @@
             <button type="button" id="regCancelBtn" style="display:none;" onclick="clearRegistrationForm()">Cancel Edit</button>
         </form>
         <hr>
-
-        <!-- DYNAMIC REPORT SUMMARY VIEW usimg History Button-->
+        
+        <!-- DYNAMIC REPORT CARD SUMMARY MODAL VIEW -->
         <div id="petHistorySection" style="display:none; background-color: #f0f4f8; padding: 20px; border: 2px solid #333; margin-bottom: 20px;">
             <h3 id="historyTitle" style="margin-top: 0; color: #1a2a3a;">Clinical Medical Card Report</h3>
             
@@ -59,7 +49,7 @@
             </table><br>
             <button type="button" onclick="document.getElementById('petHistorySection').style.display='none'">Close Medical Card</button>
         </div>
-        
+
         <h2>Registered Client Directory</h2>
         <table border="1">
             <thead>
@@ -69,9 +59,7 @@
         </table>
     </div>
 
-
-    <!--Adding logic to book appointments   -->
-    <!--Second Tab: APPOINTMENTS Booking -->
+    <!-- TAB 2: APPOINTMENTS -->
     <div id="sectionAppointments" style="display:none;">
         <h2>Book / Edit Appointment</h2>
         <form id="appointmentForm">
@@ -109,9 +97,7 @@
         </div>
     </div>
 
-
-    <!--Adding logic to add Medicines and Vaccination for treatment -->
-    <!-- Third Tab: TREATMENTS -Medicines & Vaccines -->
+    <!-- TAB 3: TREATMENTS -->
     <div id="sectionTreatments" style="display:none;">
         <div style="background-color: #f0f4f8; padding:15px; border:1px solid #ccc; margin-bottom:20px;">
             <h3>Active Patient Profile Lookup Context</h3>
@@ -184,6 +170,6 @@
         </table>
     </div>
 
-        <script src="app.js"></script>
+    <script src="static/app.js"></script>
 </body>
 </html>
