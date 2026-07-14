@@ -163,6 +163,9 @@ This project taught me how databases, backend servers, and frontend websites all
 
 Working but still learning how to make it better.
 
+
+## References for the application building process.
+
 This project is taken as reference from YOUTUBE - https://youtu.be/HZy2sSRZnxo?is=IN1B1GUw-Kj5JycQ
 
 ## Flask Application logic :
@@ -177,4 +180,12 @@ This project is taken as reference from YOUTUBE - https://youtu.be/HZy2sSRZnxo?i
  Creating Database tables taken reference from my friend.
 
  I've taken CRUD operation reference from Gemini and Chatgpt.
+
+ Rule based health engine is taken reference from realpython - https://realpython.com/python-conditional-statements/
+
+ In Javascript, "Fetch API" logic taken reference from "Bro code" Youtube channel - https://youtu.be/37vxWr0WgQk?si=8FS2T2ji_ixe2EiR
+
+ HTML logic is taken reference from - W3school - https://www.w3schools.com/html/html_forms.asp
+
+
 
