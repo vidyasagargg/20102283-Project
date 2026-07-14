@@ -14,13 +14,15 @@
     </nav>
     <hr>
 
-    <!-- TAB 1: OWNER & PET REGISTRATION -->
     <div id="sectionRegistrations">
         <h2>Register / Edit Owner & Pet Profile</h2>
         <form id="registrationForm">
             <input type="hidden" id="regId">
             <label for="regOwnerName">Owner Full Name:</label> <input type="text" id="regOwnerName" required><br><br>
-            <label for="regOwnerPhone">Owner Phone:</label> <input type="text" id="regOwnerPhone" required><br><br>
+            
+            <label for="regOwnerPhone">Owner Phone:</label> 
+            <input type="text" id="regOwnerPhone" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="e.g. 0871112222" required><br><br>
+            
             <label for="regPetName">Pet Name:</label> <input type="text" id="regPetName" required><br><br>
             <label for="regPetType">Pet Species Type:</label> <input type="text" id="regPetType" placeholder="e.g. Dog" required><br><br>
             <label for="regPetAge">Pet Age (Years):</label> <input type="number" id="regPetAge" min="0" placeholder="e.g. 3" required><br><br>
@@ -30,7 +32,6 @@
         </form>
         <hr>
         
-        <!-- DYNAMIC REPORT CARD SUMMARY MODAL VIEW -->
         <div id="petHistorySection" style="display:none; background-color: #f0f4f8; padding: 20px; border: 2px solid #333; margin-bottom: 20px;">
             <h3 id="historyTitle" style="margin-top: 0; color: #1a2a3a;">Clinical Medical Card Report</h3>
             
@@ -59,7 +60,6 @@
         </table>
     </div>
 
-    <!-- TAB 2: APPOINTMENTS -->
     <div id="sectionAppointments" style="display:none;">
         <h2>Book / Edit Appointment</h2>
         <form id="appointmentForm">
@@ -97,7 +97,6 @@
         </div>
     </div>
 
-    <!-- TAB 3: TREATMENTS -->
     <div id="sectionTreatments" style="display:none;">
         <div style="background-color: #f0f4f8; padding:15px; border:1px solid #ccc; margin-bottom:20px;">
             <h3>Active Patient Profile Lookup Context</h3>
