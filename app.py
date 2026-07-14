@@ -332,7 +332,7 @@ def delete_vaccination(vac_id):
     return jsonify({"message": "Vaccination entry deleted."}), 200
 
 # =====================================================================
-# --- HEALTH REPORT ENGINE WITH CORRECTED PRIORITY RULES ---
+# --- HEALTH REPORT ENGINE WITH NEW PATIENT SAFEGUARDS ---
 # =====================================================================
 
 @app.route('/api/treatments/history', methods=['GET'])
@@ -368,7 +368,7 @@ def get_treatment_history():
         last_vac = cursor.fetchone()
         
         is_overdue = False
-        current_date = datetime(2026, 7, 13) # Assignment baseline alignment[cite: 3]
+        current_date = datetime(2026, 7, 13)
         
         if not last_vac:
             is_overdue = True
@@ -380,8 +380,11 @@ def get_treatment_history():
             except:
                 pass
                 
-        # FIXED RULE PRIORITY ENGINE: Symptoms take immediate priority over routine vaccine dates
-        if has_symptoms:
+        # FIXED HIERARCHY: Added an initial safeguard to prevent false-positives on new registrations
+        if not ledger:
+            status = "⚪ Awaiting Evaluation"
+            recommendation = "New patient profile detected with no treatment logs. Please schedule an initial appointment consultation checkup."
+        elif has_symptoms:
             status = "🔴 Needs Attention"
             recommendation = "Book an immediate check-up to treat active clinical symptoms."
         elif is_overdue:
