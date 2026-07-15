@@ -151,8 +151,9 @@ def create_registration():
         cursor.execute('''
             INSERT INTO registrations (owner_name, owner_phone, pet_name, pet_type, pet_age) VALUES (?, ?, ?, ?, ?)
         ''', (data['owner_name'], data['owner_phone'], data['pet_name'], data['pet_type'], data['pet_age']))
+        reg_id = cursor.lastrowid
         conn.commit()
-    return jsonify({"message": "Profile registered successfully!"}), 201
+    return jsonify({"message": "Record created successfully", "id": reg_id}), 201
 
 @app.route('/api/registrations', methods=['GET'])
 def get_registrations():
@@ -161,6 +162,17 @@ def get_registrations():
         cursor.execute("SELECT * FROM registrations")
         rows = cursor.fetchall()
     return jsonify([dict(row) for row in rows]), 200
+
+# NEW: Dedicated Lookup Endpoint to handle Specific Registration Searches
+@app.route('/api/registrations/<int:reg_id>', methods=['GET'])
+def get_single_registration(reg_id):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM registrations WHERE id = ?", (reg_id,))
+        row = cursor.fetchone()
+    if row:
+        return jsonify(dict(row)), 200
+    return jsonify({"error": "Registration ID not found"}), 404
 
 @app.route('/api/registrations/<int:reg_id>', methods=['PUT'])
 def update_registration(reg_id):
@@ -173,7 +185,7 @@ def update_registration(reg_id):
             WHERE id = ?
         ''', (data['owner_name'], data['owner_phone'], data['pet_name'], data['pet_type'], data['pet_age'], reg_id))
         conn.commit()
-    return jsonify({"message": "Registration updated successfully."}), 200
+    return jsonify({"message": "Registration updated successfully.", "id": reg_id}), 200
 
 @app.route('/api/registrations/<int:reg_id>', methods=['DELETE'])
 def delete_registration(reg_id):
@@ -332,7 +344,7 @@ def delete_vaccination(vac_id):
     return jsonify({"message": "Vaccination entry deleted."}), 200
 
 # =====================================================================
-# --- HEALTH REPORT ENGINE WITH NEW PATIENT SAFEGUARDS ---
+# --- HEALTH REPORT ENGINE ---
 # =====================================================================
 
 @app.route('/api/treatments/history', methods=['GET'])
@@ -380,7 +392,6 @@ def get_treatment_history():
             except:
                 pass
                 
-        # FIXED HIERARCHY: Added an initial safeguard to prevent false-positives on new registrations
         if not ledger:
             status = "⚪ Awaiting Evaluation"
             recommendation = "New patient profile detected with no treatment logs. Please schedule an initial appointment consultation checkup."

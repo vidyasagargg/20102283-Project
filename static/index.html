@@ -29,8 +29,16 @@
             
             <button type="submit" id="regSubmitBtn">Register Client</button>
             <button type="button" id="regCancelBtn" style="display:none;" onclick="clearRegistrationForm()">Cancel Edit</button>
+            <span id="registrationSuccessMessage" style="color: green; font-weight: bold; margin-left: 15px;"></span>
         </form>
         <hr>
+        
+        <div style="background-color: #f9f9f9; padding: 12px; border: 1px solid #ccc; margin-bottom: 15px;">
+            <label for="regSearchId"><b>Search Profile by ID:</b></label>
+            <input type="number" id="regSearchId" placeholder="Enter Registration ID">
+            <button type="button" onclick="searchRegistrationById()">Search ID</button>
+            <button type="button" id="viewAllRegsBtn" onclick="toggleRegistrationsLog()" style="margin-left: 15px;">View all records</button>
+        </div>
         
         <div id="petHistorySection" style="display:none; background-color: #f0f4f8; padding: 20px; border: 2px solid #333; margin-bottom: 20px;">
             <h3 id="historyTitle" style="margin-top: 0; color: #1a2a3a;">Clinical Medical Card Report</h3>
@@ -51,13 +59,15 @@
             <button type="button" onclick="document.getElementById('petHistorySection').style.display='none'">Close Medical Card</button>
         </div>
 
-        <h2>Registered Client Directory</h2>
-        <table border="1">
-            <thead>
-                <tr><th>ID (Registration ID)</th><th>Owner Name</th><th>Phone Contact</th><th>Pet Name</th><th>Pet Species</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="registrationsBody"></tbody>
-        </table>
+        <div id="registrationsLogContainer" style="display:none;">
+            <h2>Registered Client Directory</h2>
+            <table border="1">
+                <thead>
+                    <tr><th>ID (Registration ID)</th><th>Owner Name</th><th>Phone Contact</th><th>Pet Name</th><th>Pet Species</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="registrationsBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <div id="sectionAppointments" style="display:none;">
