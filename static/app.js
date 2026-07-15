@@ -15,6 +15,43 @@ function switchTab(tabName) {
     document.getElementById('sectionTreatments').style.display = tabName === 'treatments' ? 'block' : 'none';
 }
 
+// TAB 1 - registrations
+function toggleRegistrationsLog() {
+    const container = document.getElementById('registrationsLogContainer');
+    const btn = document.getElementById('viewAllRegsBtn');
+    if (container.style.display === 'none') {
+        container.style.display = 'block';
+        btn.innerText = "Hide records log";
+        loadRegistrations();
+    } else {
+        container.style.display = 'none';
+        btn.innerText = "View all records";
+    }
+}
+
+//SEARCH FIELD
+async function searchRegistrationById() {
+    const searchId = document.getElementById('regSearchId').value;
+    const container = document.getElementById('registrationsLogContainer');
+    const tbody = document.getElementById('registrationsBody');
+    if (!searchId) { alert("Please enter a valid target Registration ID to run lookups!"); return; }
+
+    const response = await fetch(`/api/registrations/${searchId}`);
+    if (response.status === 404) {
+        alert("❌ Registration ID profile index not found inside data tables!");
+        return;
+    }
+    const reg = await response.json();
+    container.style.display = 'block';
+    document.getElementById('viewAllRegsBtn').innerText = "View all records"; // Reset baseline toggle string
+    
+    tbody.innerHTML = '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><b>${reg.id}</b></td><td>${reg.owner_name}</td><td>${reg.owner_phone}</td><td>${reg.pet_name}</td><td>${reg.pet_type}</td>
+        <td><button onclick="loadPetHistory(${reg.id})">🔎 History</button><button onclick="populateRegistrationEdit(${reg.id}, '${reg.owner_name}', '${reg.owner_phone}', '${reg.pet_name}', '${reg.pet_type}', ${reg.pet_age})">Edit</button><button onclick="deleteRegistration(${reg.id})">Delete</button></td>`;
+    tbody.appendChild(tr);
+}
+
 function toggleAppointmentsLog() {
     const container = document.getElementById('appointmentsLogContainer');
     const btn = document.getElementById('viewAllAppsBtn');
@@ -108,9 +145,9 @@ function resetPatientContext() {
     document.getElementById('medSubmitBtn').disabled = true; document.getElementById('vacSubmitBtn').disabled = true;
 }
 
-// =====================================================================
-// --- MEDICATION CRUD FLOW ---
-// =====================================================================
+
+// --- MEDICATION CRUD Operations ---
+
 async function handleMedicationSubmit(e) {
     e.preventDefault();
     const id = document.getElementById('medId').value;
@@ -160,9 +197,9 @@ async function deleteMedication(id) {
     if (confirm("Delete prescription record?")) { await fetch(`/api/medications/${id}`, { method: 'DELETE' }); loadScopedMedications(activeRegId); }
 }
 
-// =====================================================================
-// --- VACCINATION CRUD FLOW ---
-// =====================================================================
+
+// --- VACCINATION CRUD Operations ---
+
 async function handleVaccinationSubmit(e) {
     e.preventDefault();
     const id = document.getElementById('vacId').value;
@@ -206,9 +243,9 @@ async function deleteVaccination(id) {
     if (confirm("Delete vaccination log entry?")) { await fetch(`/api/vaccinations/${id}`, { method: 'DELETE' }); loadScopedVaccinations(activeRegId); }
 }
 
-// =====================================================================
+
 // --- APPOINTMENTS & REGISTRATIONS ---
-// =====================================================================
+
 async function checkClinicalSafetyRules() {
     const meds = document.getElementById('treatMeds').value;
     const warningDiv = document.getElementById('safetyWarningMessage');
@@ -269,11 +306,16 @@ async function loadRegistrations() {
 }
 
 function populateRegistrationEdit(id, owner, phone, pet, type, age) {
+    // Reveal container to easily see changes during edit sessions
+    document.getElementById('registrationsLogContainer').style.display = 'block';
+    document.getElementById('viewAllRegsBtn').innerText = "Hide records log";
+
     document.getElementById('regId').value = id; document.getElementById('regOwnerName').value = owner; document.getElementById('regOwnerPhone').value = phone;
     document.getElementById('regPetName').value = pet; document.getElementById('regPetType').value = type; document.getElementById('regPetAge').value = age;
     document.getElementById('regSubmitBtn').innerText = "Update Profile"; document.getElementById('regCancelBtn').style.display = "inline-block";
 }
 
+// ENHANCED: Captures and alerts unique serial registry keys dynamically
 async function handleRegistrationSubmit(e) {
     e.preventDefault(); const id = document.getElementById('regId').value;
     const payload = {
@@ -283,7 +325,19 @@ async function handleRegistrationSubmit(e) {
     };
     let method = id ? 'PUT' : 'POST'; let url = id ? `/api/registrations/${id}` : '/api/registrations';
     const res = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if (res.ok) { clearRegistrationForm(); loadRegistrations(); loadAppointments(); }
+    if (res.ok) {
+        const data = await res.json();
+        clearRegistrationForm();
+        loadRegistrations();
+        loadAppointments();
+        
+        // Success confirmation banner
+        if (method === 'POST') {
+            const alertSpan = document.getElementById('registrationSuccessMessage');
+            alertSpan.innerText = `Record created successfully with registration ID "${data.id}"`;
+            setTimeout(() => { alertSpan.innerText = ""; }, 5000);
+        }
+    }
 }
 
 function clearRegistrationForm() {
@@ -298,9 +352,6 @@ async function deleteRegistration(id) {
     }
 }
 
-// =====================================================================
-// --- REPORT GENERATOR ---
-// =====================================================================
 async function loadPetHistory(regId) {
     const response = await fetch(`/api/treatments/history?registration_id=${regId}`);
     const data = await response.json();
