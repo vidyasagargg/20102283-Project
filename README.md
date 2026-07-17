@@ -90,8 +90,6 @@ The system uses 5 main tables to organize data:
 - their name, their specialty
 
 ## File Structure
-
-```
 .
 ├── app.py                 (Main Flask backend code)
 ├── seed_db.py            (Adds fake test data)
@@ -100,7 +98,7 @@ The system uses 5 main tables to organize data:
 └── static/
     ├── index.html        (The website page)
     └── app.js           (Makes the website interactive)
-```
+
 
 ## How the data flows
 
@@ -177,9 +175,11 @@ This project is taken as reference from YOUTUBE - https://youtu.be/HZy2sSRZnxo?i
 
  This logic is taken from reference - https://docs.python.org/3/library/sqlite3.html
 
- Creating Database tables taken reference from my friend.
+ Creating Database tables taken reference and help from my friend.(Gurudev)
 
  I've taken CRUD operation reference from Gemini and Chatgpt.
+ https://gemini.google.com/u/3/app/da3e9ae535ff18f7
+ 
 
  Rule based health engine is taken reference from realpython - https://realpython.com/python-conditional-statements/
 
